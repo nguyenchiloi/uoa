@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ú Òa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #14101c;
+    --bg2: #1c1626;
+    --card: #241d33;
+    --card-line: #362b48;
+    --ink: #f3eefb;
+    --muted: #a99bc2;
+    --accent: #ff5a4c;
+    --accent2: #ff9a3d;
+    --shadow: 0 30px 70px -30px rgba(0,0,0,.7);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(1100px 600px at 15% -10%, rgba(255,255,255,.06), transparent 60%),
+      radial-gradient(900px 700px at 110% 10%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 55%),
+      var(--bg);
+    min-height: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 26px 16px 40px;
+    transition: background .5s ease;
+  }
+
+  /* theme accents per category */
+  body[data-cat="food"]   { --accent: #ff5a4c; --accent2: #ff9a3d; }
+  body[data-cat="drink"]  { --accent: #ec4899; --accent2: #a855f7; }
+  body[data-cat="travel"] { --accent: #06b6d4; --accent2: #22c55e; }
+  body[data-cat="folk"]   { --accent: #d97706; --accent2: #65a30d; }
+  body[data-cat="group"]  { --accent: #818cf8; --accent2: #c084fc; }
+  body[data-cat="online"] { --accent: #22d3ee; --accent2: #6366f1; }
+  body[data-cat="anvat"]  { --accent: #f97316; --accent2: #f43f5e; }
+  body[data-cat="quan"]   { --accent: #b45309; --accent2: #eab308; }
+  body[data-cat="nhau"]   { --accent: #dc2626; --accent2: #f59e0b; }
+
+  .wrap { width: 100%; max-width: 620px; }
+
+  .top {
+    text-align: center;
+    margin-bottom: 22px;
+  }
+  .top h1 {
+    font-size: 1.9rem;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    background: linear-gradient(120deg, #fff, #d9cdf0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .top p {
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: .92rem;
+  }
+  .top .slogan {
+    font-style: italic;
+    color: color-mix(in srgb, var(--accent2) 65%, var(--muted));
+  }
+  #topSub { margin-top: 4px; }
+
+  .footer {
+    text-align: center;
+    margin-top: 28px;
+    color: var(--muted);
+    font-size: .78rem;
+    letter-spacing: .02em;
+  }
+  .footer b { color: var(--ink); }
+
+  [hidden] { display: none !important; }
+
+  /* ---------- Category screen ---------- */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  @media (min-width: 480px) {
+    .cat-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .cat-card {
+    position: relative;
+    border: 1px solid var(--card-line);
+    background: linear-gradient(155deg, var(--card), #1a1526);
+    border-radius: 20px;
+    padding: 18px 14px 16px;
+    cursor: pointer;
+    text-align: center;
+    color: inherit;
+    font-family: inherit;
+    overflow: hidden;
+    transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+  }
+  .cat-card::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(120px 90px at 50% -10%, var(--tint, rgba(255,255,255,.12)), transparent 70%);
+    opacity: .9;
+    pointer-events: none;
+  }
+  .cat-card:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--tint2, #fff) 40%, var(--card-line));
+    box-shadow: var(--shadow);
+  }
+  .cat-card .icon {
+    font-size: 2.1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px; height: 60px;
+    border-radius: 18px;
+    margin: 0 auto 10px;
+    background: linear-gradient(135deg, var(--tint2a), var(--tint2b));
+    box-shadow: 0 10px 22px -10px color-mix(in srgb, var(--tint2a) 70%, transparent);
+  }
+  .cat-card .label {
+    font-weight: 700;
+    font-size: .96rem;
+    line-height: 1.25;
+  }
+  .cat-card .count {
+    margin-top: 4px;
+    font-size: .76rem;
+    color: var(--muted);
+  }
+
+  /* ---------- Spin screen ---------- */
+  .backbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .back-btn {
+    border: 1px solid var(--card-line);
+    background: var(--card);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: .85rem;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .back-btn:hover { border-color: var(--accent); }
+  .cat-title {
+    font-weight: 800;
+    font-size: 1.15rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .reel-shell {
+    position: relative;
+    border-radius: 22px;
+    padding: 3px;
+    background: linear-gradient(120deg, var(--accent), var(--accent2));
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    animation: shellGlow 1.6s ease-in-out infinite;
+    animation-play-state: paused;
+  }
+  .reel-shell.is-spinning { animation-play-state: running; }
+  .reel-shell.is-spinning::before {
+    content: "";
+    position: absolute;
+    inset: -60%;
+    background: conic-gradient(var(--accent), var(--accent2), #fff, var(--accent2), var(--accent));
+    animation: shellRotate 1s linear infinite;
+  }
+  @keyframes shellRotate {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes shellGlow {
+    0%, 100% { box-shadow: var(--shadow), 0 0 0 0 color-mix(in srgb, var(--accent2) 55%, transparent); }
+    50% { box-shadow: var(--shadow), 0 0 30px 6px color-mix(in srgb, var(--accent2) 55%, transparent); }
+  }
+  .reel-viewport {
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    background: linear-gradient(180deg, #100b18, #1a1424);
+    padding: 22px 0;
+  }
+  .reel-track {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    will-change: transform;
+    padding: 0 14px;
+  }
+  .reel-card {
+    flex: 0 0 auto;
+    width: 108px;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #241d33;
+    border: 2px solid #3a3050;
+    transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+  }
+  .reel-card .thumb {
+    width: 108px;
+    height: 108px;
+    object-fit: cover;
+    display: block;
+  }
+  body[data-cat="online"] .reel-card .thumb {
+    object-fit: contain;
+    background: #fff;
+    padding: 12px;
+    box-sizing: border-box;
+  }
+  body[data-cat="online"] .result .rphoto {
+    background: #fff;
+  }
+  body[data-cat="online"] .result .rphoto img {
+    object-fit: contain;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+  .reel-card .thumb-emoji {
+    width: 108px;
+    height: 108px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.6rem;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 35%, #241d33), color-mix(in srgb, var(--accent2) 35%, #241d33));
+  }
+  .reel-card .rname {
+    font-size: .68rem;
+    font-weight: 600;
+    text-align: center;
+    padding: 6px 4px 7px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .reel-card.is-winner {
+    border-color: var(--accent2);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent2) 45%, transparent), 0 12px 26px -10px color-mix(in srgb, var(--accent2) 70%, transparent);
+    transform: scale(1.06);
+  }
+
+  .reel-fade-l, .reel-fade-r {
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 64px;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .reel-fade-l { left: 0; background: linear-gradient(90deg, #100b18, transparent); }
+  .reel-fade-r { right: 0; background: linear-gradient(270deg, #100b18, transparent); }
+
+  .pointer {
+    position: absolute;
+    left: 50%;
+    top: 0; bottom: 0;
+    width: 2px;
+    background: color-mix(in srgb, var(--accent2) 80%, #fff);
+    transform: translateX(-50%);
+    z-index: 4;
+    box-shadow: 0 0 12px color-mix(in srgb, var(--accent2) 80%, transparent);
+  }
+  .pointer::before, .pointer::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 8px solid transparent;
+  }
+  .pointer::before {
+    top: -1px;
+    border-top: 10px solid var(--accent2);
+  }
+  .pointer::after {
+    bottom: -1px;
+    border-bottom: 10px solid var(--accent2);
+  }
+
+  .spin-btn {
+    margin-top: 20px;
+    width: 100%;
+    border: 0;
+    cursor: pointer;
+    color: #fff;
+    font-family: inherit;
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: .03em;
+    padding: 17px 20px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    box-shadow: 0 18px 34px -12px color-mix(in srgb, var(--accent) 70%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+  }
+  .spin-btn:hover:not(:disabled) { transform: translateY(-2px); }
+  .spin-btn:active:not(:disabled) { transform: translateY(0) scale(.99); }
+  .spin-btn:disabled { filter: grayscale(.35) brightness(.9); cursor: default; }
+  .spin-btn.is-spinning { animation: btnPulse 1s ease-in-out infinite; }
+  @keyframes btnPulse {
+    0%, 100% { box-shadow: 0 18px 34px -12px color-mix(in srgb, var(--accent) 70%, transparent); }
+    50% { box-shadow: 0 18px 44px -8px color-mix(in srgb, var(--accent2) 85%, transparent); }
+  }
+
+  .dice {
+    display: inline-block;
+    font-size: 1.2em;
+  }
+  .spin-btn.is-spinning .dice {
+    animation: diceRoll .55s cubic-bezier(.4,0,.2,1) infinite;
+  }
+  @keyframes diceRoll {
+    0%   { transform: rotate(0deg) scale(1); }
+    25%  { transform: rotate(100deg) scale(1.15); }
+    50%  { transform: rotate(200deg) scale(1); }
+    75%  { transform: rotate(300deg) scale(1.15); }
+    100% { transform: rotate(360deg) scale(1); }
+  }
+
+  .result {
+    margin-top: 18px;
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 20px;
+    padding: 18px;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    box-shadow: var(--shadow);
+    animation: pop .35s ease;
+  }
+  @keyframes pop {
+    from { opacity: 0; transform: translateY(8px) scale(.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .result .rphoto {
+    flex: 0 0 auto;
+    width: 84px; height: 84px;
+    border-radius: 14px;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.1rem;
+  }
+  .result .rphoto img { width: 100%; height: 100%; object-fit: cover; }
+  .result .rtext { flex: 1 1 auto; min-width: 0; }
+  .result .rtext .rn { font-weight: 800; font-size: 1.15rem; }
+  .result .rtext .rd { color: var(--muted); font-size: .88rem; margin-top: 4px; line-height: 1.45; }
+  .play-btn {
+    margin-top: 10px;
+    border: 0;
+    cursor: pointer;
+    color: #fff;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: .85rem;
+    padding: 9px 14px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    box-shadow: 0 10px 20px -10px color-mix(in srgb, var(--accent) 70%, transparent);
+  }
+  .play-btn:hover { filter: brightness(1.06); }
+
+  /* ---------- Mini game overlay ---------- */
+  .mini-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 5, 14, .72);
+    backdrop-filter: blur(3px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 50;
+  }
+  .mini-modal {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 22px;
+    padding: 22px 20px 20px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    animation: pop .3s ease;
+  }
+  .mini-close {
+    position: absolute;
+    top: 12px; right: 12px;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--card-line);
+    background: var(--bg2);
+    color: var(--ink);
+    font-size: .9rem;
+    cursor: pointer;
+  }
+  .mini-modal h3 {
+    font-size: 1.15rem;
+    font-weight: 800;
+    padding-right: 26px;
+  }
+  .mini-stage {
+    min-height: 210px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin: 14px 0;
+  }
+  .mini-result {
+    margin-bottom: 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--accent2) 16%, var(--card));
+    border: 1px solid color-mix(in srgb, var(--accent2) 40%, var(--card-line));
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.4;
+    animation: pop .3s ease;
+  }
+  .mini-action {
+    width: 100%;
+    border: 0;
+    cursor: pointer;
+    color: #fff;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 1rem;
+    padding: 13px 16px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    box-shadow: 0 14px 26px -10px color-mix(in srgb, var(--accent) 70%, transparent);
+  }
+  .mini-action:disabled { filter: grayscale(.3) brightness(.9); cursor: default; }
+
+  /* Wheel */
+  .wheel-wrap { position: relative; width: 200px; height: 200px; }
+  .wheel-pointer {
+    position: absolute;
+    top: -12px; left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 18px solid var(--accent2);
+    z-index: 2;
+  }
+  .wheel {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    position: relative;
+    border: 5px solid var(--card);
+    box-shadow: 0 0 0 3px var(--accent2), var(--shadow);
+    transition: transform 4.2s cubic-bezier(.1,.68,.18,1);
+  }
+  .wheel-num {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 24px; height: 24px;
+    margin: -12px 0 0 -12px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800;
+    font-size: .82rem;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0,0,0,.5);
+  }
+  .wheel-legend {
+    font-size: .74rem;
+    color: var(--muted);
+    line-height: 1.6;
+    text-align: left;
+    max-height: 90px;
+    overflow-y: auto;
+    padding: 8px 10px;
+    background: var(--bg2);
+    border-radius: 10px;
+    border: 1px solid var(--card-line);
+  }
+  .wheel-legend b { color: var(--ink); }
+
+  /* Lots / cards */
+  .slip-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .slip-btn {
+    width: 56px; height: 74px;
+    border-radius: 8px;
+    border: 2px dashed color-mix(in srgb, var(--accent2) 55%, var(--card-line));
+    background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 25%, var(--card)), var(--card));
+    color: var(--accent2);
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .slip-btn:disabled { opacity: .35; cursor: default; }
+  .card-btn {
+    width: 58px; height: 82px;
+    border-radius: 10px;
+    border: 2px solid color-mix(in srgb, var(--accent2) 50%, var(--card-line));
+    background: linear-gradient(155deg, color-mix(in srgb, var(--accent) 30%, var(--card)), var(--card));
+    color: var(--accent2);
+    font-size: 1.4rem;
+    cursor: pointer;
+  }
+  .card-btn:disabled { opacity: .35; cursor: default; }
+
+  /* Dice */
+  .die-face {
+    width: 84px; height: 84px;
+    border-radius: 16px;
+    background: #fff;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    padding: 12px;
+    box-sizing: border-box;
+    box-shadow: 0 10px 22px -10px rgba(0,0,0,.6);
+    transition: transform .15s ease;
+  }
+  .die-face.is-rolling { animation: dieShake .12s linear infinite; }
+  @keyframes dieShake {
+    0% { transform: rotate(0deg); }
+    50% { transform: rotate(12deg); }
+    100% { transform: rotate(-12deg); }
+  }
+  .die-dot { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+  .die-dot::after {
+    content: "";
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: #1c1626;
+  }
+
+  .hint {
+    text-align: center;
+    margin-top: 14px;
+    color: var(--muted);
+    font-size: .8rem;
+  }
+  .hint kbd {
+    font-family: inherit;
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-bottom-width: 2px;
+    border-radius: 6px;
+    padding: 1px 6px;
+    font-size: .78rem;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+
+    <div class="top">
+      <h1>Ú Òa 🎉</h1>
+      <p class="slogan">Không biết chọn gì? Nhắm mắt bấm nút, để số phận lo phần còn lại!</p>
+      <p id="topSub">Chọn một thể loại rồi bấm "Ú Òa" để vòng quay chọn giúp bạn.</p>
+    </div>
+
+    <!-- Screen 1: category picker -->
+    <section id="screenCategories">
+      <div class="cat-grid" id="catGrid"></div>
+    </section>
+
+    <!-- Screen 2: spin -->
+    <section id="screenSpin" hidden>
+      <div class="backbar">
+        <button class="back-btn" id="backBtn">← Đổi thể loại</button>
+        <div class="cat-title" id="catTitle"></div>
+      </div>
+
+      <div class="reel-shell">
+        <div class="reel-viewport" id="reelViewport">
+          <div class="reel-track" id="reelTrack"></div>
+          <div class="reel-fade-l"></div>
+          <div class="reel-fade-r"></div>
+          <div class="pointer"></div>
+        </div>
+      </div>
+
+      <button class="spin-btn" id="spinBtn">
+        <span class="dice" id="diceIcon">🎲</span>
+        <span id="spinBtnText">Ú Òa</span>
+      </button>
+
+      <div class="result" id="result" hidden>
+        <div class="rphoto" id="rphoto"><span id="rEmoji"></span></div>
+        <div class="rtext">
+          <div class="rn" id="rName"></div>
+          <div class="rd" id="rDesc"></div>
+          <button class="play-btn" id="playBtn" hidden>🎮 Chơi ngay</button>
+        </div>
+      </div>
+
+      <p class="hint">Mẹo: nhấn phím <kbd>Space</kbd> để "Ú Òa" nhanh</p>
+    </section>
+
+    <p class="footer">Được làm bởi <b>Chú Vịt Vàng (NCL)</b> 🦆</p>
+
+    <div class="mini-overlay" id="miniOverlay" hidden>
+      <div class="mini-modal">
+        <button class="mini-close" id="miniClose">✕</button>
+        <h3 id="miniTitle"></h3>
+        <div class="mini-stage" id="miniStage"></div>
+        <div class="mini-result" id="miniResult" hidden></div>
+        <button class="mini-action" id="miniAction"></button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ---------------- data ----------------
+  function w(file) {
+    return "https://commons.wikimedia.org/wiki/Special:FilePath/" + encodeURIComponent(file) + "?width=800";
+  }
+
+  const CATEGORIES = {
+    food: {
+      label: "Món ăn", emoji: "🍜", tint2a: "#ff5a4c", tint2b: "#ff9a3d",
+      items: [
+        { name: "Cơm tấm sườn bì chả", emoji: "🍚", file: "Cơm tấm sườn bì chả.jpg", desc: "Sườn nướng, bì, chả trứng, mỡ hành, chan nước mắm chua ngọt." },
+        { name: "Cơm nhà", emoji: "🍳", file: "Vietnamese family daily meal.jpg", desc: "Canh rau, thịt kho, cá kho, rau luộc — bữa cơm quen thuộc và nhẹ nhàng." },
+        { name: "Phở bò", emoji: "🍜", file: "First bite of the pho in The Big Bowl.jpg", desc: "Nước dùng ninh xương thơm quế hồi, bánh phở mềm, bò tái nạm gầu." },
+        { name: "Bún bò Huế", emoji: "🌶️", file: "Bún bò Huế.jpg", desc: "Nước lèo cay nồng sả ớt, giò heo, chả cua, huyết — đậm đà kiểu Huế." },
+        { name: "Bún thịt nướng", emoji: "🥩", file: "Bun thit nuong.jpg", desc: "Bún tươi, thịt nướng thơm, rau sống, đồ chua, đậu phộng, nước mắm." },
+        { name: "Bánh mì thịt", emoji: "🥖", file: "Bánh mì.jpg", desc: "Vỏ giòn rụm, pa-tê, thịt nguội, đồ chua, dưa leo, rau mùi." },
+        { name: "Bún chả Hà Nội", emoji: "🍢", file: "Bún chả.jpg", desc: "Chả viên và thịt nướng thả trong bát nước mắm ấm, ăn kèm bún và rau." },
+        { name: "Gỏi cuốn tôm thịt", emoji: "🫓", file: "Gỏi cuốn.jpg", desc: "Tôm, thịt, bún và rau cuốn bánh tráng, chấm mắm nêm hoặc tương đậu." },
+        { name: "Cơm gà", emoji: "🍗", file: "Com ga Viet Nam voi ga luoc com vang va nuoc cham.jpg", desc: "Cơm vàng nấu bằng nước luộc gà, gà xé phay, rau răm, hành phi." },
+        { name: "Gà rán", emoji: "🍗", file: "Fried chicken.jpg", desc: "Gà chiên giòn rụm, ăn kèm cơm trắng hoặc khoai tây chiên." },
+        { name: "Hủ tiếu Nam Vang", emoji: "🍲", file: "Hủ tiếu Nam Vang.jpg", desc: "Nước trong ngọt xương, tôm, thịt bằm, gan, trứng cút — ăn nước hoặc khô." },
+        { name: "Mì Quảng", emoji: "🦐", file: "Mì Quảng.jpg", desc: "Sợi mì vàng, chan ít nước nhân đậm đà, bánh tráng nướng, đậu phộng." },
+        { name: "Bún nước tương", emoji: "🥬", file: "Vietnamese vegetarian crab noodle soup.jpg", desc: "Bún chan nước tương, đậu hũ chiên, rau sống — nhẹ bụng, hợp buổi trưa." },
+        { name: "Bún cá", emoji: "🐟", file: "Bun cha ca.jpg", desc: "Chả cá và cá chiên, nước dùng chua nhẹ, thì là, hành lá." },
+        { name: "Bún riêu cua", emoji: "🦀", file: "Bun rieu.jpg", desc: "Nước dùng riêu cua chua thanh vị cà chua, đậu hũ, huyết, chả." },
+        { name: "Bánh xèo", emoji: "🥞", file: "Bánh xèo 1.jpg", desc: "Bánh gạo chiên giòn nhân tôm thịt giá đỗ, cuốn rau sống chấm mắm." },
+        { name: "Bánh cuốn", emoji: "🫔", file: "Bánh cuốn Thanh Trì.jpg", desc: "Bánh tráng mỏng hấp nhân thịt mộc nhĩ, ăn kèm chả và nước chấm." },
+        { name: "Bánh bèo", emoji: "🍥", file: "Bánh bèo.jpg", desc: "Bánh gạo hấp nhỏ xinh, rắc tôm cháy và mỡ hành, đặc sản Huế." },
+        { name: "Bánh khọt", emoji: "🥘", file: "Bánh khọt (2020-3-28).jpg", desc: "Bánh chiên giòn trong khuôn nhỏ, nhân tôm, ăn kèm rau sống." },
+        { name: "Cao lầu", emoji: "🍜", file: "Cao lầu Hội An (2024).jpg", desc: "Sợi mì dai vàng đặc trưng Hội An, ăn cùng thịt xá xíu và rau sống." },
+        { name: "Bún đậu mắm tôm", emoji: "🧈", file: "Bún đậu mắm tôm.jpg", desc: "Đậu hũ chiên, chả cốm, bún lá chấm mắm tôm dậy mùi đặc trưng." },
+        { name: "Cơm chiên dương châu", emoji: "🍛", file: "Yangzhou fried rice and drinks 06-09-2019.jpg", desc: "Cơm chiên với xá xíu, tôm, trứng và rau củ thái hạt lựu nhiều màu." },
+        { name: "Nem nướng Nha Trang", emoji: "🍢", file: "Mẹt nem nướng Nha Trang.jpg", desc: "Thịt nướng que cuốn bánh tráng rau sống, chấm nước chấm đậu phộng." },
+        { name: "Chả cá Lã Vọng", emoji: "🐟", file: "Chả cá Lã Vọng Hà Nội.jpg", desc: "Cá lăng ướp nghệ nướng chảo nóng cùng thì là, ăn với bún và mắm tôm." },
+        { name: "Bánh canh cua", emoji: "🦞", file: "Bánh canh cua.jpg", desc: "Sợi bánh canh dai mềm trong nước dùng cua gạch béo ngậy." },
+        { name: "Xôi gà", emoji: "🍚", file: "Xôi gà.jpg", desc: "Xôi nếp dẻo ăn cùng gà xé, hành phi và ruốc, bữa sáng quen thuộc." },
+        { name: "Vịt quay", emoji: "🦆", file: "Vịt quay thất khê.jpg", desc: "Vịt quay da giòn thơm ngũ vị, chấm nước tương gừng." },
+        { name: "Cà ri gà", emoji: "🍛", file: "Cà Ri Gà Vietnamese Chicken Curry 2019-1600.jpg", desc: "Gà nấu cà ri nước cốt dừa beo béo, ăn cùng bánh mì hoặc bún." },
+        { name: "Súp cua", emoji: "🥣", file: "Súp cua Việt Nam.jpg", desc: "Súp sánh mịn với thịt cua, trứng cút và nấm, ấm bụng ngày mưa." },
+        { name: "Bò kho", emoji: "🍲", file: "Bo-Kho-2011.jpg", desc: "Thịt bò hầm sả quế đậm đà, ăn cùng bánh mì hoặc bún tươi." },
+      ],
+    },
+    drink: {
+      label: "Món nước", emoji: "🥤", tint2a: "#ec4899", tint2b: "#a855f7",
+      items: [
+        { name: "Cà phê sữa đá", emoji: "☕", file: "Ca Phe Sua Da.jpg", desc: "Cà phê phin đậm đà hoà cùng sữa đặc, uống với đá mát lạnh." },
+        { name: "Cà phê trứng", emoji: "🥚", file: "Vietnam-Hanoi-Egg coffee-P1280590.jpg", desc: "Lòng đỏ trứng đánh bông béo mịn phủ trên cà phê đen, đặc sản Hà Nội." },
+        { name: "Trà chanh", emoji: "🍋", file: "Chanhmuoiglass.jpg", desc: "Trà pha chanh tươi, chua ngọt thanh mát, món vỉa hè quen thuộc." },
+        { name: "Nước mía", emoji: "🌾", file: "Nước mía Mỹ Tho.jpg", desc: "Mía tươi ép lấy nước, ngọt mát, giải khát ngày hè." },
+        { name: "Sinh tố bơ", emoji: "🥑", file: "Sinh tố bơ.jpg", desc: "Bơ xay cùng sữa đặc và đá, béo ngậy và mát lạnh." },
+        { name: "Chè bà ba", emoji: "🍧", file: "Chè bà ba.jpg", desc: "Đậu, khoai, nước cốt dừa hoà quyện — món chè miền Nam quen thuộc." },
+        { name: "Nước dừa", emoji: "🥥", file: null, desc: "Nước dừa tươi mát lành, uống trực tiếp từ trái dừa xiêm." },
+        { name: "Bia hơi", emoji: "🍺", file: "Viet Ha Beer at the Bia hoi, Tay Ho, Vietnam (6923012212).jpg", desc: "Bia tươi giải nhiệt, thường nhâm nhi cùng bạn bè lúc chiều tối." },
+        { name: "Trà sữa", emoji: "🧋", file: "Bubble tea by Bumba (44 Ho Tung Mau Road, Cau Giay District, Hanoi, Vietnam).jpg", desc: "Trà sữa trân châu, món đồ uống giới trẻ Việt Nam mê mẩn." },
+        { name: "Trà đá", emoji: "🧊", file: null, desc: "Trà pha loãng uống kèm đá, gần như miễn phí ở khắp quán ăn Việt Nam." },
+        { name: "Nước cam", emoji: "🍊", file: "Nước cam phục vụ tiệc đứng ở Sài Gòn năm 2014.jpg", desc: "Cam vắt tươi nguyên chất, bổ sung vitamin C sảng khoái." },
+        { name: "Nước ép dứa", emoji: "🍍", file: "Pineapple Juice in Glass Jar.jpg", desc: "Dứa ép lấy nước, vị chua ngọt thanh mát rất dễ uống." },
+        { name: "Chanh dây", emoji: "🫐", file: "Cocktail of passion fruit juice and watermelon juice in a glass.jpg", desc: "Nước chanh dây chua thơm, hạt lắc đều giòn tan trong miệng." },
+        { name: "Sữa đậu nành", emoji: "🥛", file: "Soy milk.jpg", desc: "Đậu nành xay lọc mịn, uống nóng hoặc lạnh đều ngon và bổ dưỡng." },
+        { name: "Sữa chua đá", emoji: "🍨", file: "Bags of Vietnamese-style yogurt.jpg", desc: "Sữa chua đánh đá bào, chua nhẹ beo béo, giải nhiệt cực đã." },
+        { name: "Nước tắc", emoji: "🍈", file: null, desc: "Quất tươi dầm mật ong pha nước, chua ngọt the mát rất đưa miệng." },
+        { name: "Trà đào cam sả", emoji: "🍑", file: null, desc: "Trà đào thơm lừng kết hợp cam tươi và sả, uống lạnh cực sảng khoái." },
+        { name: "Trà atiso", emoji: "🌿", file: null, desc: "Trà nấu từ bông atiso Đà Lạt, thanh mát và tốt cho gan." },
+        { name: "Sinh tố xoài", emoji: "🥭", file: "AE liên hoan, Sinh tố xoài ở Bình Tân, ng8th2n2020 (1).jpg", desc: "Xoài chín xay cùng sữa đặc và đá, ngọt thơm béo mịn." },
+        { name: "Sinh tố dâu", emoji: "🍓", file: "Sinh to dau.jpg", desc: "Dâu tây xay mịn cùng sữa, màu hồng bắt mắt và vị chua ngọt hài hoà." },
+        { name: "Chè khúc bạch", emoji: "🤍", file: "Chè khúc bạch ở quán Thảo Vy 2020 09 06.jpg", desc: "Thạch phô mai mềm mịn, hạnh nhân và nhãn ngâm nước đường mát lạnh." },
+        { name: "Chè đậu xanh", emoji: "💚", file: "Chè đậu xanh nha đam.jpg", desc: "Đậu xanh nấu nhừ bùi béo, nước cốt dừa thơm ngậy ăn kèm đá." },
+        { name: "Trà gừng", emoji: "🫖", file: "Ginger Tea .jpg", desc: "Gừng tươi nấu cùng trà nóng, ấm bụng và tốt cho những ngày se lạnh." },
+        { name: "Rượu cần", emoji: "🏺", file: "Chôn rượu men lá trong chum dưới đất1,xã Đôn Phục,Con Cuông,Nghệ An.jpg", desc: "Rượu ủ trong chum, uống bằng cần trúc dài — nét văn hoá Tây Nguyên." },
+        { name: "Nước chanh muối", emoji: "🍋", file: null, desc: "Chanh muối ngâm lâu ngày pha nước đường, mặn ngọt chua hài hoà." },
+        { name: "Cacao đá", emoji: "🍫", file: null, desc: "Bột cacao pha sữa đá, vị đắng nhẹ béo ngậy cho buổi chiều tỉnh táo." },
+        { name: "Nước ép cà rốt", emoji: "🥕", file: "GlassOfJuice and carrots.JPG", desc: "Cà rốt ép nguyên chất, ngọt dịu và giàu vitamin A." },
+        { name: "Sữa chua uống", emoji: "🧃", file: null, desc: "Sữa chua dạng lỏng dễ uống, vị chua ngọt nhẹ nhàng giải khát." },
+        { name: "Nước sâm bí đao", emoji: "🌱", file: null, desc: "Nước nấu từ bí đao và thảo mộc, thanh nhiệt giải độc cơ thể." },
+        { name: "Trà bí đao", emoji: "🫙", file: null, desc: "Trà nấu từ bí đao và la hán quả, ngọt thanh và giải nhiệt cơ thể." },
+      ],
+    },
+    travel: {
+      label: "Du lịch Việt Nam", emoji: "🗺️", tint2a: "#06b6d4", tint2b: "#22c55e",
+      items: [
+        { name: "Quảng Ninh", emoji: "🌊", file: "Halong Bay in Vietnam.jpg", desc: "Vịnh Hạ Long, đảo Cô Tô, Yên Tử — kỳ quan đá vôi và non thiêng nổi tiếng." },
+        { name: "Quảng Nam", emoji: "🏮", file: "Hội An, Ancient Town, 2020-01 CN-01.jpg", desc: "Phố cổ Hội An, thánh địa Mỹ Sơn, Cù Lao Chàm — di sản văn hoá thế giới." },
+        { name: "Lào Cai", emoji: "⛰️", file: "Terrace Sapa Vietnam.jpg", desc: "Sa Pa, đỉnh Fansipan, Bắc Hà — ruộng bậc thang và khí hậu se lạnh." },
+        { name: "Lâm Đồng", emoji: "🌸", file: "Da Lat - Viet Nam.jpg", desc: "Đà Lạt, hồ Xuân Hương, thác Datanla — thành phố ngàn hoa mát mẻ quanh năm." },
+        { name: "Quảng Bình", emoji: "🕳️", file: "Phong Nha-Ke Bang cave3.jpg", desc: "Động Phong Nha, động Thiên Đường, sông Chày - hang Tối — hang động kỳ vĩ." },
+        { name: "Ninh Bình", emoji: "🚣", file: "Trang An Landscape Complex in Ninh Binh.jpg", desc: "Tràng An, Tam Cốc - Bích Động, chùa Bái Đính — 'Hạ Long trên cạn'." },
+        { name: "Kiên Giang", emoji: "🏝️", file: "Phu Quoc beach 01.jpg", desc: "Đảo Phú Quốc, Hà Tiên, quần đảo Nam Du — biển xanh, cát trắng, hải sản tươi." },
+        { name: "Thừa Thiên Huế", emoji: "🏯", file: "Imperial City Hue 20190917-3.jpg", desc: "Đại Nội Huế, lăng Khải Định, sông Hương — kinh thành cổ kính triều Nguyễn." },
+        { name: "Đà Nẵng", emoji: "🐉", file: "Da Nang Dragon Bridge.jpg", desc: "Cầu Rồng, Bà Nà Hills, bán đảo Sơn Trà — thành phố biển đáng sống." },
+        { name: "Bình Thuận", emoji: "🏜️", file: "Mui Ne sand dunes 1.jpg", desc: "Mũi Né, Phan Thiết, đồi cát bay Hòn Rơm — thiên đường biển và đồi cát." },
+        { name: "Khánh Hòa", emoji: "🏖️", file: "Nha Trang Beach 2.jpg", desc: "Nha Trang, Vinpearl, đảo Bình Ba — bãi biển nổi tiếng miền Trung." },
+        { name: "Hà Nội", emoji: "🏛️", file: "Hanoi Old Quarter (40267872341).jpg", desc: "Hồ Gươm, phố cổ 36 phố phường, Văn Miếu — thủ đô ngàn năm văn hiến." },
+        { name: "Thành phố Hồ Chí Minh", emoji: "🏙️", file: "Ho Chi Minh City Skyline.jpg", desc: "Chợ Bến Thành, Nhà thờ Đức Bà, phố đi bộ Nguyễn Huệ — đô thị sôi động nhất nước." },
+        { name: "Kon Tum", emoji: "🌲", file: "Cuoc-song-nguoi-dong-bao-tai-lang-kon-pring-thi-tran-mang-den-kon-tum-15.jpg", desc: "Măng Đen, nhà thờ gỗ Kon Tum, cầu treo Kon Klor — 'Đà Lạt thứ hai' Tây Nguyên." },
+        { name: "Đồng Nai", emoji: "🏞️", file: "Đảo Ó ở Đồng Nai th9n2019 (hồ Trị An) (1).jpg", desc: "Hồ Trị An, Vườn quốc gia Nam Cát Tiên, đảo Ó - đảo Đồng Trường." },
+        { name: "Hải Phòng", emoji: "⚓", file: "07-HAIPHONG PORT.jpg", desc: "Cát Bà, Đồ Sơn, đảo Dấu — thành phố cảng cửa ngõ ra biển." },
+        { name: "Cần Thơ", emoji: "🛶", file: "Can Tho, Vietnam, Floating Market, Boats 2.jpg", desc: "Chợ nổi Cái Răng, bến Ninh Kiều, vườn trái cây Mỹ Khánh — thủ phủ miền Tây." },
+        { name: "An Giang", emoji: "🕌", file: "Vietnam, Panorama of Chau Doc.jpg", desc: "Châu Đốc, núi Sam, rừng tràm Trà Sư — đặc trưng sông nước miền Tây." },
+        { name: "Đắk Lắk", emoji: "☕", file: "Buôn Ma Thuột - buildings at Exile House former prison Apr 2024 02.jpg", desc: "Buôn Ma Thuột, hồ Lắk, thác Dray Nur — thủ phủ cà phê Tây Nguyên." },
+        { name: "Hà Giang", emoji: "🏔️", file: "Mountain road at Mã Pí Lèng Pass, Hà Giang Province, Vietnam.jpg", desc: "Cao nguyên đá Đồng Văn, đèo Mã Pí Lèng, cột cờ Lũng Cú." },
+        { name: "Cao Bằng", emoji: "💦", file: "Ban Gioc Waterfall - Trung Kanh District - Cao Bang Province - Vietnam - 05 (48119871617).jpg", desc: "Thác Bản Giốc, động Ngườm Ngao, hồ Thang Hen — một trong những thác đẹp nhất Đông Nam Á." },
+        { name: "Quảng Ngãi", emoji: "🏝️", file: "Ly Son3.jpg", desc: "Đảo Lý Sơn, biển Sa Huỳnh, Mỹ Khê — biển xanh và vựa tỏi nổi tiếng." },
+        { name: "Bình Định", emoji: "🌅", file: "Quy Nhon city at sunset.jpg", desc: "Quy Nhơn, Kỳ Co, Eo Gió — bãi biển đẹp và ẩm thực miền Trung đặc sắc." },
+        { name: "Phú Yên", emoji: "🪨", file: "Beach in Tuy Hoa 1.jpg", desc: "Gành Đá Đĩa, Mũi Điện, Bãi Xép — khung cảnh hoang sơ nổi tiếng qua phim ảnh." },
+        { name: "Ninh Thuận", emoji: "🐫", file: "Hang Rái in Ninh Thuan Province, Vietnam.jpg", desc: "Hang Rái, vịnh Vĩnh Hy, đồi cát Nam Cương — vùng đất nắng gió." },
+        { name: "Bà Rịa - Vũng Tàu", emoji: "🏖️", file: "Bai Truoc Vung Tau.jpg", desc: "Bãi Sau, tượng Chúa Kitô, Côn Đảo — thành phố biển gần Sài Gòn." },
+        { name: "Tây Ninh", emoji: "🚡", file: "Cáp treo núi Bà Đen.JPG", desc: "Núi Bà Đen, tòa thánh Cao Đài, hồ Dầu Tiếng — 'nóc nhà Nam Bộ'." },
+        { name: "Điện Biên", emoji: "🎖️", file: "Mường Thanh Valley.jpg", desc: "Đồi A1, cánh đồng Mường Thanh, đèo Pha Đin — vùng đất lịch sử hào hùng." },
+        { name: "Thanh Hóa", emoji: "🌊", file: "Bãi biển Sầm Sơn ở Thanh Hóa.jpg", desc: "Sầm Sơn, thành nhà Hồ, suối cá Cẩm Lương — quen thuộc với du khách miền Bắc." },
+        { name: "Cà Mau", emoji: "🌴", file: "Cà Mau city center.jpg", desc: "Đất Mũi, rừng U Minh Hạ, hòn Đá Bạc — điểm cực Nam thiêng liêng của Tổ quốc." },
+      ],
+    },
+    folk: {
+      label: "Trò chơi dân gian", emoji: "🪢", tint2a: "#d97706", tint2b: "#65a30d",
+      items: [
+        { name: "Nhảy dây", emoji: "🪢", file: null, desc: "Hai người quay dây, người chơi nhảy qua sao cho không vướng chân." },
+        { name: "Ô ăn quan", emoji: "🟤", file: null, desc: "Trò chơi trí tuệ dân gian với ô vuông và những viên sỏi nhỏ." },
+        { name: "Rồng rắn lên mây", emoji: "🐍", file: null, desc: "Cả nhóm nối đuôi nhau né tránh 'thầy thuốc' bắt người cuối hàng." },
+        { name: "Bịt mắt bắt dê", emoji: "🐐", file: null, desc: "Một người bịt mắt cố gắng bắt được người chơi khác trong vòng tròn." },
+        { name: "Kéo co", emoji: "🪵", file: null, desc: "Hai đội kéo dây về phía mình, đội nào mạnh hơn sẽ thắng." },
+        { name: "Nhảy bao bố", emoji: "🛍️", file: null, desc: "Người chơi đứng trong bao bố nhảy về đích nhanh nhất." },
+        { name: "Chơi chuyền", emoji: "✋", file: null, desc: "Dùng que và banh nhỏ, vừa tung banh vừa nhặt que theo nhịp." },
+        { name: "Đá cầu", emoji: "🏸", file: null, desc: "Dùng chân giữ quả cầu lông không rơi xuống đất." },
+        { name: "Ném lon", emoji: "🥫", file: null, desc: "Ném bóng trúng chồng lon để hạ gục toàn bộ." },
+        { name: "Trốn tìm", emoji: "🙈", file: null, desc: "Một người bịt mắt đếm số, những người còn lại đi trốn." },
+      ],
+    },
+    group: {
+      label: "Trò chơi nhóm", emoji: "🐺", tint2a: "#818cf8", tint2b: "#c084fc",
+      items: [
+        { name: "Ma sói", emoji: "🐺", file: null, desc: "Trò chơi nhập vai suy luận, tìm ra ai là sói trong làng." },
+        { name: "Cướp cờ", emoji: "🚩", file: null, desc: "Hai đội giành lấy lá cờ ở giữa sân rồi chạy về phần mình." },
+        { name: "Đập niêu", emoji: "🏺", file: null, desc: "Bịt mắt cầm gậy đập trúng niêu đất treo lơ lửng." },
+        { name: "Truy tìm kho báu", emoji: "🗺️", file: null, desc: "Giải mật thư, tìm manh mối để đến được kho báu cuối cùng." },
+        { name: "Nối từ", emoji: "🔤", file: null, desc: "Người sau nối từ bắt đầu bằng chữ cuối của người trước." },
+        { name: "Đuổi hình bắt chữ", emoji: "🖼️", file: null, desc: "Nhìn hình đoán từ hoặc câu thành ngữ ẩn trong đó." },
+        { name: "Rung chuông vàng", emoji: "🔔", file: null, desc: "Trả lời câu hỏi nhanh, ai trụ lại đến cuối cùng sẽ thắng." },
+        { name: "Ghế âm nhạc", emoji: "🪑", file: null, desc: "Đi vòng quanh ghế theo nhạc, nhạc dừng thì nhanh tay ngồi xuống." },
+        { name: "Ai là triệu phú", emoji: "💰", file: null, desc: "Trả lời chuỗi câu hỏi khó dần để giành phần thưởng." },
+        { name: "Mật thư", emoji: "🔍", file: null, desc: "Giải các đoạn mã, ký hiệu để tìm ra thông điệp bí mật." },
+      ],
+    },
+    online: {
+      label: "Game Online", emoji: "🎮", tint2a: "#22d3ee", tint2b: "#6366f1",
+      items: [
+        { name: "Liên Quân Mobile", emoji: "⚔️", file: "Arena of Valor logo.png", desc: "Đấu trường MOBA 5v5 quen thuộc trên điện thoại." },
+        { name: "PUBG", emoji: "🔫", file: "PUBG Studios Logo.svg", desc: "Chiến thuật sinh tồn, thu thập trang bị và sống sót đến cuối trận." },
+        { name: "Liên Minh Huyền Thoại", emoji: "🛡️", file: "League of Legends 2019 vector.svg", desc: "MOBA huyền thoại trên PC với hàng trăm vị tướng." },
+        { name: "Valorant", emoji: "🎯", file: "Valorant logo.svg", desc: "Bắn súng chiến thuật 5v5 kết hợp kỹ năng đặc biệt." },
+        { name: "Among Us", emoji: "🚀", file: "Among Us Logo.svg", desc: "Tìm ra kẻ giả mạo trong phi hành đoàn trước khi quá muộn." },
+        { name: "Minecraft", emoji: "⛏️", file: "Minecraft Logo.png", desc: "Xây dựng và khám phá thế giới khối vuông vô tận." },
+        { name: "Roblox", emoji: "🧱", file: "Roblox Logo 2022.svg", desc: "Nền tảng chơi và tạo hàng ngàn minigame khác nhau." },
+        { name: "FC Online", emoji: "⚽", file: "EA Sports FC logo.svg", desc: "Game bóng đá trực tuyến với các đội tuyển và cầu thủ nổi tiếng." },
+        { name: "Genshin Impact", emoji: "🌠", file: "Genshin Impact wordmark.svg", desc: "Phiêu lưu nhập vai mở thế giới rộng lớn với yếu tố nguyên tố." },
+      ],
+    },
+    anvat: {
+      label: "Ăn vặt", emoji: "🍡", tint2a: "#f97316", tint2b: "#f43f5e",
+      items: [
+        { name: "Bánh tráng trộn", emoji: "🥗", file: "Bánh tráng trộn foodstand.jpg", desc: "Bánh tráng xé nhỏ trộn xoài, khô bò, rau răm, đậu phộng và sa tế." },
+        { name: "Bánh tráng nướng", emoji: "🍕", file: "Bánh tráng nướng TP. Hồ Chí Minh - street food in Ho Chi Minh City, Vietnam.jpg", desc: "Bánh tráng nướng trứng phô mai, được ví như 'pizza Việt Nam'." },
+        { name: "Cá viên chiên", emoji: "🍢", file: "Cá viên 1.JPG", desc: "Cá viên chiên vàng giòn, chấm tương ớt, món khoái khẩu học trò." },
+        { name: "Xoài lắc", emoji: "🥭", file: "Xoai lac.jpg", desc: "Xoài xanh bào sợi lắc cùng muối tôm, đường và sa tế chua cay." },
+        { name: "Trứng cút lộn xào me", emoji: "🥚", file: null, desc: "Trứng cút lộn xào sốt me chua ngọt, rắc đậu phộng và rau răm." },
+        { name: "Bò bía", emoji: "🌯", file: "Bo Bia Jicama Rolls.jpg", desc: "Bánh tráng cuốn củ sắn, lạp xưởng, trứng và rau thơm, chấm tương." },
+        { name: "Bánh flan", emoji: "🍮", file: "Crème caramel 2.jpg", desc: "Trứng sữa hấp mềm mịn, phủ caramel đắng nhẹ béo ngậy." },
+        { name: "Kem que", emoji: "🍦", file: null, desc: "Kem que nhiều vị đủ màu, món ăn vặt tuổi thơ giá vài nghìn đồng." },
+        { name: "Kẹo dừa", emoji: "🥥", file: "Vietnamese coconut candy.jpg", desc: "Kẹo dẻo từ nước cốt dừa và mạch nha, đặc sản Bến Tre." },
+        { name: "Bắp xào", emoji: "🌽", file: "Bắp xào bơ (bắp nếp) ở Bình Tân (1).jpg", desc: "Bắp Mỹ xào bơ béo ngậy, rắc thêm hành phi và tôm khô." },
+        { name: "Khoai lang lắc", emoji: "🍠", file: null, desc: "Khoai lang chiên lắc cùng phô mai hoặc bơ đường, giòn tan bên ngoài." },
+        { name: "Nem chua rán", emoji: "🧆", file: "Nem-chua-ran2.jpg", desc: "Nem chua chiên giòn ăn kèm tương ớt và rau răm, nhâm nhi cực đã." },
+        { name: "Chân gà sả tắc", emoji: "🍗", file: null, desc: "Chân gà ngâm sả tắc chua cay giòn sần sật, món khoái khẩu giới trẻ." },
+        { name: "Ốc luộc", emoji: "🐌", file: null, desc: "Các loại ốc luộc chấm mắm gừng hoặc me chua cay, ăn cùng bạn bè." },
+        { name: "Trứng vịt lộn", emoji: "🥚", file: "Hotvitlon.jpg", desc: "Trứng vịt lộn luộc ăn kèm rau răm, gừng và chút muối tiêu chanh." },
+        { name: "Chuối chiên", emoji: "🍌", file: "Chuối chiên.JPG", desc: "Chuối bọc bột chiên giòn, vàng ruộm, ăn nóng thơm ngon." },
+        { name: "Bánh bao", emoji: "🥟", file: "Banh Bao at Tay Son Binh Dinh Vietnam.JPG", desc: "Bánh bao hấp nhân thịt trứng cút, mềm xốp và ấm bụng." },
+        { name: "Bánh đúc", emoji: "🍥", file: null, desc: "Bánh gạo mềm mịn ăn cùng nước mắm chua ngọt và đậu phộng." },
+      ],
+    },
+    quan: {
+      label: "Hàng quán ăn uống", emoji: "🏪", tint2a: "#b45309", tint2b: "#eab308",
+      items: [
+        { name: "Phúc Long", emoji: "🍵", file: null, desc: "Trà và cà phê Việt lâu năm, nổi tiếng với trà sữa best-seller." },
+        { name: "Katinat", emoji: "☕", file: null, desc: "Quán cà phê phong cách trẻ trung, không gian đẹp để check-in." },
+        { name: "Highlands Coffee", emoji: "☕", file: null, desc: "Cà phê phin sữa đá quen thuộc, có mặt ở khắp mọi con phố." },
+        { name: "The Coffee House", emoji: "🏠", file: null, desc: "Không gian ấm cúng, quen thuộc với dân văn phòng và sinh viên." },
+        { name: "Cộng Cà Phê", emoji: "⭐", file: null, desc: "Cà phê phong cách hoài cổ, nổi tiếng với cốt dừa cà phê." },
+        { name: "Trung Nguyên Legend", emoji: "🌾", file: null, desc: "Thương hiệu cà phê Việt lâu đời, đậm đà bản sắc Tây Nguyên." },
+        { name: "Phê La", emoji: "🍃", file: null, desc: "Trà ô long phong cách hiện đại, được giới trẻ yêu thích." },
+        { name: "Gong Cha", emoji: "🧋", file: null, desc: "Trà sữa Đài Loan với trân châu đường đen nổi tiếng." },
+        { name: "TocoToco", emoji: "🧋", file: null, desc: "Chuỗi trà sữa Việt với menu đa dạng, giá bình dân." },
+        { name: "KFC", emoji: "🍗", file: null, desc: "Gà rán giòn tan kiểu Mỹ, quen thuộc với mọi gia đình." },
+        { name: "Lotteria", emoji: "🍔", file: null, desc: "Burger và gà rán phong cách Hàn Quốc, giá học sinh." },
+        { name: "Jollibee", emoji: "🐝", file: null, desc: "Gà rán Philippines với sốt gravy đặc trưng." },
+        { name: "Pizza 4P's", emoji: "🍕", file: null, desc: "Pizza phong cách Nhật - Ý, phô mai kéo sợi ấn tượng." },
+        { name: "Domino's Pizza", emoji: "🍕", file: null, desc: "Pizza giao nhanh, đế dày phô mai ngập tràn." },
+        { name: "Mixue", emoji: "🍦", file: null, desc: "Kem và trà sữa giá rẻ, biểu tượng chú tuyết nhân dễ thương." },
+        { name: "Starbucks Việt Nam", emoji: "🧜", file: null, desc: "Chuỗi cà phê toàn cầu, không gian làm việc yêu thích của nhiều người." },
+      ],
+    },
+    nhau: {
+      label: "Trò chơi ăn nhậu", emoji: "🍻", tint2a: "#dc2626", tint2b: "#f59e0b",
+      items: [
+        { name: "Oẳn tù tì", emoji: "🪨", file: null, desc: "Kéo búa bao, thua thì uống — đơn giản mà không bao giờ chán." },
+        { name: "Xì dách", emoji: "🃏", file: null, desc: "Rút bài so điểm gần 21, thua ván nào uống ván đó." },
+        { name: "Bầu cua tôm cá", emoji: "🦀", file: null, desc: "Lắc xúc xắc đoán hình, đặt cửa sai thì làm một ly." },
+        { name: "Vua đại tần", emoji: "👑", file: null, desc: "Rút bài theo luật quy định sẵn, mỗi lá bài một hình phạt uống." },
+        { name: "Chưa từng", emoji: "🤫", file: null, desc: "Ai từng làm điều được nhắc tới thì uống một ly." },
+        { name: "Đếm số né số cấm", emoji: "🔢", file: null, desc: "Đếm tuần tự, ai vào đúng số cấm (như 3, 7) mà không né thì uống." },
+        { name: "Ai nhanh tay đó thắng", emoji: "✋", file: null, desc: "Phản xạ nhanh trong trò chơi tay, chậm tay là uống phạt." },
+        { name: "Xoay chai", emoji: "🍾", file: null, desc: "Xoay chai chỉ vào ai thì người đó thực hiện thử thách hoặc uống." },
+        { name: "Thách đố", emoji: "🎯", file: null, desc: "Chọn nói thật hoặc làm thử thách, né tránh cả hai thì uống phạt." },
+        { name: "Đoán bài hát qua giai điệu", emoji: "🎵", file: null, desc: "Nghe vài giây giai điệu, đoán sai tên bài hát thì uống." },
+        { name: "Bốc thăm may rủi", emoji: "🎫", file: null, play: "lots", desc: "Rút một lá thăm bất kỳ để xem hình phạt đang chờ mình — chơi ngay trên trang!" },
+        { name: "Vòng quay may mắn", emoji: "🎡", file: null, play: "wheel", desc: "Quay vòng may mắn, kim chỉ dừng ở đâu thì chịu hình phạt ở đó — chơi ngay trên trang!" },
+        { name: "Rút bài định mệnh", emoji: "🃏", file: null, play: "cards", desc: "Chọn một lá bài úp để lật ra thử thách của riêng bạn — chơi ngay trên trang!" },
+        { name: "Xúc xắc định mệnh", emoji: "🎲", file: null, play: "dice", desc: "Đổ xúc xắc, số hiện lên sẽ quyết định hình phạt — chơi ngay trên trang!" },
+      ],
+    },
+  };
+
+  // ---------------- category screen ----------------
+  const catGrid = document.getElementById("catGrid");
+  Object.keys(CATEGORIES).forEach((key) => {
+    const cat = CATEGORIES[key];
+    const btn = document.createElement("button");
+    btn.className = "cat-card";
+    btn.style.setProperty("--tint2a", cat.tint2a);
+    btn.style.setProperty("--tint2b", cat.tint2b);
+    btn.style.setProperty("--tint2", cat.tint2a);
+    btn.innerHTML =
+      '<div class="icon">' + cat.emoji + '</div>' +
+      '<div class="label">' + cat.label + '</div>' +
+      '<div class="count">' + cat.items.length + ' mục</div>';
+    btn.addEventListener("click", () => openCategory(key));
+    catGrid.appendChild(btn);
+  });
+
+  // ---------------- spin screen ----------------
+  const screenCategories = document.getElementById("screenCategories");
+  const screenSpin = document.getElementById("screenSpin");
+  const catTitle = document.getElementById("catTitle");
+  const backBtn = document.getElementById("backBtn");
+  const reelViewport = document.getElementById("reelViewport");
+  const reelTrack = document.getElementById("reelTrack");
+  const spinBtn = document.getElementById("spinBtn");
+  const spinBtnText = document.getElementById("spinBtnText");
+  const result = document.getElementById("result");
+  const rphoto = document.getElementById("rphoto");
+  const rEmoji = document.getElementById("rEmoji");
+  const rName = document.getElementById("rName");
+  const rDesc = document.getElementById("rDesc");
+  const topSub = document.getElementById("topSub");
+
+  let currentKey = null;
+  let spinning = false;
+
+  function openCategory(key) {
+    currentKey = key;
+    const cat = CATEGORIES[key];
+    document.body.setAttribute("data-cat", key);
+    catTitle.textContent = cat.emoji + " " + cat.label;
+    topSub.textContent = "Bấm \"Ú Òa\" để vòng quay chọn ngẫu nhiên trong " + cat.label.toLowerCase() + ".";
+    screenCategories.hidden = true;
+    screenSpin.hidden = false;
+    result.hidden = true;
+    spinBtnText.textContent = "Ú Òa";
+    renderStaticReel(key);
+  }
+
+  backBtn.addEventListener("click", () => {
+    screenSpin.hidden = true;
+    screenCategories.hidden = false;
+    topSub.textContent = "Chọn một thể loại rồi bấm \"Ú Òa\" để vòng quay chọn giúp bạn.";
+    document.body.removeAttribute("data-cat");
+  });
+
+  function renderCard(item) {
+    const media = item.file
+      ? '<img class="thumb" src="' + w(item.file) + '" alt="" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement(\'div\'),{className:\'thumb-emoji\',textContent:\'' + item.emoji + '\'}))" />'
+      : '<div class="thumb-emoji">' + item.emoji + '</div>';
+    return '<div class="reel-card">' + media + '<div class="rname">' + item.name + '</div></div>';
+  }
+
+  function renderStaticReel(key) {
+    const items = CATEGORIES[key].items;
+    const rotation = Math.floor(Math.random() * items.length);
+    const preview = [];
+    for (let i = 0; i < Math.min(8, items.length); i++) {
+      preview.push(items[(i + rotation) % items.length]);
+    }
+    reelTrack.style.transition = "none";
+    reelTrack.style.transform = "translateX(0px)";
+    reelTrack.innerHTML = preview.map(renderCard).join("");
+  }
+
+  const REEL_LEN = 40;
+  const WINNER_IDX = 32;
+
+  function pickRandom(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  // Builds a reel by cycling through the FULL item list in its original
+  // order, starting from a random rotation point. This means the reel
+  // always scrolls through every item from start to end before repeating
+  // (instead of randomly reshuffling, which can look like the same handful
+  // of items keep popping up). The winner is simply whatever item lands
+  // at WINNER_IDX for the chosen rotation, so the result is still uniformly
+  // random across the whole list.
+  function buildReelSequence(items, length, rotation) {
+    const n = items.length;
+    const seq = [];
+    for (let i = 0; i < length; i++) {
+      seq.push(items[(i + rotation) % n]);
+    }
+    return seq;
+  }
+
+  function spin() {
+    if (spinning || !currentKey) return;
+    spinning = true;
+    spinBtn.disabled = true;
+    spinBtnText.textContent = "Đang mở...";
+    spinBtn.classList.add("is-spinning");
+    reelViewport.closest(".reel-shell").classList.add("is-spinning");
+    result.hidden = true;
+
+    const items = CATEGORIES[currentKey].items;
+    const rotation = Math.floor(Math.random() * items.length);
+    const reelItems = buildReelSequence(items, REEL_LEN, rotation);
+    const winner = reelItems[WINNER_IDX];
+
+    reelTrack.style.transition = "none";
+    reelTrack.style.transform = "translateX(0px)";
+    reelTrack.innerHTML = reelItems.map(renderCard).join("");
+
+    // force reflow
+    void reelTrack.offsetWidth;
+
+    const cards = reelTrack.children;
+    const slotWidth = cards[1].getBoundingClientRect().left - cards[0].getBoundingClientRect().left;
+    const winnerCard = cards[WINNER_IDX];
+    const viewportWidth = reelViewport.clientWidth;
+    const targetCenter = winnerCard.offsetLeft + winnerCard.offsetWidth / 2;
+    const jitter = (Math.random() - 0.5) * (slotWidth * 0.35);
+    const offset = targetCenter - viewportWidth / 2 + jitter;
+
+    requestAnimationFrame(() => {
+      reelTrack.style.transition = "transform 5.4s cubic-bezier(.09,.79,.13,1)";
+      reelTrack.style.transform = "translateX(-" + offset + "px)";
+    });
+
+    function onEnd(e) {
+      if (e.propertyName !== "transform") return;
+      reelTrack.removeEventListener("transitionend", onEnd);
+      winnerCard.classList.add("is-winner");
+
+      if (winner.file) {
+        rphoto.innerHTML = '<img src="' + w(winner.file) + '" alt="" referrerpolicy="no-referrer" onerror="this.parentElement.innerHTML=\'' + winner.emoji + '\'" />';
+      } else {
+        rphoto.textContent = winner.emoji;
+      }
+      rName.textContent = winner.name;
+      rDesc.textContent = winner.desc;
+      result.hidden = false;
+
+      if (winner.play) {
+        playBtn.hidden = false;
+        playBtn.onclick = () => openMiniGame(winner.play, winner.name);
+      } else {
+        playBtn.hidden = true;
+        playBtn.onclick = null;
+      }
+
+      spinning = false;
+      spinBtn.disabled = false;
+      spinBtn.classList.remove("is-spinning");
+      reelViewport.closest(".reel-shell").classList.remove("is-spinning");
+      spinBtnText.textContent = "Ú Òa lần nữa";
+    }
+    reelTrack.addEventListener("transitionend", onEnd);
+  }
+
+  spinBtn.addEventListener("click", spin);
+  document.addEventListener("keydown", (e) => {
+    if ((e.code === "Space" || e.key === "Enter") && !screenSpin.hidden) {
+      e.preventDefault();
+      spin();
+    }
+  });
+
+  // ==================== Mini games (Trò chơi ăn nhậu) ====================
+  const playBtn = document.getElementById("playBtn");
+  const miniOverlay = document.getElementById("miniOverlay");
+  const miniClose = document.getElementById("miniClose");
+  const miniTitle = document.getElementById("miniTitle");
+  const miniStage = document.getElementById("miniStage");
+  const miniResult = document.getElementById("miniResult");
+  const miniAction = document.getElementById("miniAction");
+
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  const LOT_OUTCOMES = [
+    "Uống 1 ly 🍺", "Uống cạn ly luôn! 🥴", "Được tha, khỏi uống 🎉",
+    "Mời 1 người bất kỳ uống cùng", "Kể 1 câu chuyện xui xẻo",
+    "Bắt chước tiếng 1 con vật bất kỳ", "Nhảy 1 điệu trong 10 giây",
+    "Đổi ghế với người bên cạnh", "Uống 2 ly 🍻", "Hát 1 câu bài hát bất kỳ",
+    "Nói 1 câu tỏ tình ngẫu hứng", "Im lặng không nói gì trong 1 phút",
+  ];
+  const WHEEL_OUTCOMES = [
+    "Uống 1 ly", "Uống 2 ly", "Mời người bên trái uống",
+    "Mời người bên phải uống", "Được tha, khỏi uống", "Uống cạn ly",
+    "Làm 1 thử thách bất kỳ", "Hát 1 câu bất kỳ",
+  ];
+  const DICE_OUTCOMES = [
+    "Uống 1 ly", "Uống 2 ly", "Mời 1 người uống cùng",
+    "Được tha, khỏi uống", "Uống cạn ly", "Làm 1 thử thách vui",
+  ];
+  const DIE_LAYOUTS = {
+    1: [4],
+    2: [0, 8],
+    3: [0, 4, 8],
+    4: [0, 2, 6, 8],
+    5: [0, 2, 4, 6, 8],
+    6: [0, 2, 3, 5, 6, 8],
+  };
+
+  let miniType = null;
+
+  function openMiniGame(type, name) {
+    miniType = type;
+    miniTitle.textContent = name;
+    miniResult.hidden = true;
+    miniResult.textContent = "";
+    miniOverlay.hidden = false;
+    if (type === "lots") setupLots();
+    else if (type === "wheel") setupWheel();
+    else if (type === "cards") setupCards();
+    else if (type === "dice") setupDice();
+  }
+
+  function closeMiniGame() {
+    miniOverlay.hidden = true;
+    miniAction.onclick = null;
+  }
+  miniClose.addEventListener("click", closeMiniGame);
+  miniOverlay.addEventListener("click", (e) => {
+    if (e.target === miniOverlay) closeMiniGame();
+  });
+
+  // ---- Bốc thăm may rủi ----
+  function setupLots() {
+    const picks = shuffle(LOT_OUTCOMES).slice(0, 6);
+    miniStage.innerHTML =
+      '<div class="slip-grid">' +
+      picks.map((_, i) => '<button class="slip-btn" data-i="' + i + '">🎫</button>').join("") +
+      "</div>";
+    miniAction.textContent = "Chơi lại";
+    miniAction.disabled = true;
+    miniAction.onclick = setupLots;
+
+    miniStage.querySelectorAll(".slip-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (miniStage.dataset.locked) return;
+        miniStage.dataset.locked = "1";
+        miniStage.querySelectorAll(".slip-btn").forEach((b) => { if (b !== btn) b.disabled = true; });
+        btn.textContent = "✅";
+        miniResult.textContent = picks[+btn.dataset.i];
+        miniResult.hidden = false;
+        miniAction.disabled = false;
+      });
+    });
+    delete miniStage.dataset.locked;
+  }
+
+  // ---- Rút bài định mệnh ----
+  function setupCards() {
+    const picks = shuffle(LOT_OUTCOMES).slice(0, 6);
+    miniStage.innerHTML =
+      '<div class="slip-grid">' +
+      picks.map((_, i) => '<button class="card-btn" data-i="' + i + '">🂠</button>').join("") +
+      "</div>";
+    miniAction.textContent = "Chơi lại";
+    miniAction.disabled = true;
+    miniAction.onclick = setupCards;
+
+    miniStage.querySelectorAll(".card-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (miniStage.dataset.locked) return;
+        miniStage.dataset.locked = "1";
+        miniStage.querySelectorAll(".card-btn").forEach((b) => { if (b !== btn) b.disabled = true; });
+        btn.textContent = "🃏";
+        miniResult.textContent = picks[+btn.dataset.i];
+        miniResult.hidden = false;
+        miniAction.disabled = false;
+      });
+    });
+    delete miniStage.dataset.locked;
+  }
+
+  // ---- Vòng quay may mắn ----
+  let wheelCumulative = 0;
+  function setupWheel() {
+    const n = WHEEL_OUTCOMES.length;
+    const seg = 360 / n;
+    const colors = ["var(--accent)", "var(--accent2)"];
+    const stops = [];
+    for (let i = 0; i < n; i++) {
+      stops.push(colors[i % 2] + " " + (i * seg) + "deg " + ((i + 1) * seg) + "deg");
+    }
+    const nums = [];
+    for (let i = 0; i < n; i++) {
+      const mid = i * seg + seg / 2;
+      nums.push('<div class="wheel-num" style="transform: rotate(' + mid + 'deg) translateY(-72px)">' + (i + 1) + "</div>");
+    }
+    wheelCumulative = 0;
+    miniStage.innerHTML =
+      '<div class="wheel-wrap"><div class="wheel-pointer"></div><div class="wheel" id="wheelEl" style="background: conic-gradient(' + stops.join(", ") + ')">' + nums.join("") + "</div></div>" +
+      '<div class="wheel-legend">' + WHEEL_OUTCOMES.map((t, i) => "<div><b>" + (i + 1) + ".</b> " + t + "</div>").join("") + "</div>";
+    miniAction.textContent = "Quay!";
+    miniAction.disabled = false;
+    miniAction.onclick = spinWheel;
+  }
+  function spinWheel() {
+    miniAction.disabled = true;
+    miniResult.hidden = true;
+    const n = WHEEL_OUTCOMES.length;
+    const seg = 360 / n;
+    const winIdx = Math.floor(Math.random() * n);
+    const wheelEl = document.getElementById("wheelEl");
+
+    // Rotate so the chosen segment's center lands under the top pointer,
+    // always spinning forward (never backward) from the current position.
+    const mid = winIdx * seg + seg / 2;
+    const desiredMod = (360 - mid + 360) % 360;
+    const currentMod = ((wheelCumulative % 360) + 360) % 360;
+    let delta = desiredMod - currentMod;
+    if (delta <= 0) delta += 360;
+    wheelCumulative += 360 * 5 + delta;
+    wheelEl.style.transform = "rotate(" + wheelCumulative + "deg)";
+
+    function onWheelEnd(e) {
+      if (e.propertyName !== "transform") return;
+      wheelEl.removeEventListener("transitionend", onWheelEnd);
+      miniResult.textContent = (winIdx + 1) + ". " + WHEEL_OUTCOMES[winIdx];
+      miniResult.hidden = false;
+      miniAction.disabled = false;
+      miniAction.textContent = "Quay lại";
+    }
+    wheelEl.addEventListener("transitionend", onWheelEnd);
+  }
+
+  // ---- Xúc xắc định mệnh ----
+  function dieCellsHtml(value) {
+    const dots = DIE_LAYOUTS[value];
+    let cells = "";
+    for (let i = 0; i < 9; i++) {
+      cells += dots.includes(i) ? '<div class="die-dot"></div>' : "<div></div>";
+    }
+    return cells;
+  }
+  function setupDice() {
+    miniStage.innerHTML = '<div class="die-face" id="dieEl">' + dieCellsHtml(1) + "</div>";
+    miniAction.textContent = "Đổ xúc xắc!";
+    miniAction.disabled = false;
+    miniAction.onclick = rollDice;
+  }
+  function rollDice() {
+    miniAction.disabled = true;
+    miniResult.hidden = true;
+    const dieEl = document.getElementById("dieEl");
+    dieEl.classList.add("is-rolling");
+    let ticks = 0;
+    const timer = setInterval(() => {
+      dieEl.innerHTML = dieCellsHtml(1 + Math.floor(Math.random() * 6));
+      ticks++;
+      if (ticks >= 10) {
+        clearInterval(timer);
+        dieEl.classList.remove("is-rolling");
+        const finalValue = 1 + Math.floor(Math.random() * 6);
+        dieEl.innerHTML = dieCellsHtml(finalValue);
+        miniResult.textContent = "🎲 " + finalValue + " — " + DICE_OUTCOMES[finalValue - 1];
+        miniResult.hidden = false;
+        miniAction.disabled = false;
+        miniAction.textContent = "Đổ lại";
+      }
+    }, 80);
+  }
+</script>
+</body>
+</html>
