@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <radialGradient id="bg" cx="30%" cy="20%" r="90%">
+      <stop offset="0%" stop-color="#2a2140"/>
+      <stop offset="100%" stop-color="#14101c"/>
+    </radialGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff5a4c"/>
+      <stop offset="100%" stop-color="#ff9a3d"/>
+    </linearGradient>
+  </defs>
+
+  <!-- badge -->
+  <rect x="4" y="4" width="192" height="192" rx="46" fill="url(#bg)" stroke="#362b48" stroke-width="3"/>
+
+  <!-- glow -->
+  <circle cx="150" cy="40" r="70" fill="#ff9a3d" opacity="0.14"/>
+
+  <!-- peekaboo hands (bottom) -->
+  <path d="M18 138
+           C 18 108, 46 96, 62 108
+           C 70 96, 92 96, 98 112
+           L 98 178
+           C 98 190, 88 196, 76 196
+           L 40 196
+           C 24 196, 18 186, 18 172
+           Z"
+        fill="url(#accent)"/>
+  <path d="M102 112
+           C 108 96, 130 96, 138 108
+           C 154 96, 182 108, 182 138
+           L 182 172
+           C 182 186, 176 196, 160 196
+           L 124 196
+           C 112 196, 102 190, 102 178
+           Z"
+        fill="url(#accent)"/>
+
+  <!-- finger gaps -->
+  <path d="M58 112 L58 196" stroke="#14101c" stroke-width="6" stroke-linecap="round" opacity="0.35"/>
+  <path d="M142 112 L142 196" stroke="#14101c" stroke-width="6" stroke-linecap="round" opacity="0.35"/>
+
+  <!-- peeking eyes over the hands -->
+  <circle cx="72" cy="98" r="13" fill="#f3eefb"/>
+  <circle cx="75" cy="98" r="6.5" fill="#14101c"/>
+  <path d="M112 96 q14 -16 28 0" stroke="#f3eefb" stroke-width="7" stroke-linecap="round" fill="none"/>
+
+  <!-- confetti sparkle -->
+  <circle cx="150" cy="42" r="5" fill="#ff9a3d"/>
+  <circle cx="164" cy="58" r="3" fill="#ff5a4c"/>
+  <path d="M132 30 l6 6 m0 -6 l-6 6" stroke="#f3eefb" stroke-width="3" stroke-linecap="round"/>
+</svg>

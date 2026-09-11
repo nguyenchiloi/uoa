@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 160" width="520" height="160">
+  <defs>
+    <radialGradient id="bg2" cx="30%" cy="20%" r="90%">
+      <stop offset="0%" stop-color="#2a2140"/>
+      <stop offset="100%" stop-color="#14101c"/>
+    </radialGradient>
+    <linearGradient id="accent2g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff5a4c"/>
+      <stop offset="100%" stop-color="#ff9a3d"/>
+    </linearGradient>
+    <linearGradient id="text2g" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#d9cdf0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- icon badge -->
+  <g transform="translate(6,6)">
+    <rect width="148" height="148" rx="36" fill="url(#bg2)" stroke="#362b48" stroke-width="3"/>
+    <circle cx="112" cy="30" r="52" fill="#ff9a3d" opacity="0.14"/>
+
+    <path d="M14 104
+             C 14 80, 36 71, 48 80
+             C 55 71, 72 71, 77 84
+             L 77 138
+             C 77 148, 69 153, 59 153
+             L 31 153
+             C 18 153, 14 145, 14 134
+             Z" fill="url(#accent2g)"/>
+    <path d="M80 84
+             C 85 71, 103 71, 109 80
+             C 121 71, 143 80, 143 104
+             L 143 134
+             C 143 145, 138 153, 125 153
+             L 97 153
+             C 87 153, 80 148, 80 138
+             Z" fill="url(#accent2g)"/>
+
+    <path d="M45 84 L45 153" stroke="#14101c" stroke-width="5" stroke-linecap="round" opacity="0.35"/>
+    <path d="M111 84 L111 153" stroke="#14101c" stroke-width="5" stroke-linecap="round" opacity="0.35"/>
+
+    <circle cx="56" cy="74" r="10" fill="#f3eefb"/>
+    <circle cx="58.5" cy="74" r="5" fill="#14101c"/>
+    <path d="M88 72 q11 -12 22 0" stroke="#f3eefb" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+
+    <circle cx="118" cy="32" r="4" fill="#ff9a3d"/>
+    <circle cx="129" cy="45" r="2.4" fill="#ff5a4c"/>
+  </g>
+
+  <!-- wordmark -->
+  <text x="176" y="88" font-family="'Be Vietnam Pro', 'Segoe UI', sans-serif" font-weight="800" font-size="64" fill="url(#text2g)" letter-spacing="-1">Ú Òa</text>
+  <text x="178" y="118" font-family="'Be Vietnam Pro', 'Segoe UI', sans-serif" font-weight="600" font-size="20" fill="#a99bc2">Nhắm mắt bấm nút 🎉</text>
+</svg>
