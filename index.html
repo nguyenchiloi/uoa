@@ -423,6 +423,17 @@
     font-size: .9rem;
     cursor: pointer;
   }
+  .mini-settings {
+    position: absolute;
+    top: 12px; right: 52px;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--card-line);
+    background: var(--bg2);
+    color: var(--ink);
+    font-size: .9rem;
+    cursor: pointer;
+  }
   .mini-modal h3 {
     font-size: 1.15rem;
     font-weight: 800;
@@ -631,6 +642,53 @@
     color: var(--muted);
   }
 
+  /* Config / setup forms */
+  .config-form {
+    text-align: left;
+    width: 100%;
+  }
+  .config-form--row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .config-label {
+    display: block;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin: 10px 0 6px;
+  }
+  .config-label:first-child { margin-top: 0; }
+  .config-textarea {
+    width: 100%;
+    resize: vertical;
+    background: var(--bg2);
+    border: 1px solid var(--card-line);
+    border-radius: 12px;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: .88rem;
+    padding: 10px 12px;
+    line-height: 1.5;
+  }
+  .config-input {
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--card-line);
+    border-radius: 12px;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: .9rem;
+    padding: 10px 12px;
+    box-sizing: border-box;
+  }
+  .config-hint {
+    margin-top: 8px;
+    font-size: .76rem;
+    color: var(--muted);
+  }
+
   .hint {
     text-align: center;
     margin-top: 14px;
@@ -668,6 +726,7 @@
       <div class="backbar">
         <button class="back-btn" id="backBtn">← Đổi thể loại</button>
         <div class="cat-title" id="catTitle"></div>
+        <button class="back-btn" id="catSettingsBtn" hidden style="margin-left:auto;">⚙️ Tuỳ chỉnh</button>
       </div>
 
       <div class="reel-shell">
@@ -707,9 +766,19 @@
       </div>
     </div>
 
+    <div class="mini-overlay" id="categorySetupOverlay" hidden>
+      <div class="mini-modal">
+        <button class="mini-close" id="categorySetupClose">✕</button>
+        <h3 id="categorySetupTitle"></h3>
+        <div class="mini-stage" id="categorySetupBody"></div>
+        <button class="mini-action" id="categorySetupStart">Bắt đầu quay</button>
+      </div>
+    </div>
+
     <div class="mini-overlay" id="miniOverlay" hidden>
       <div class="mini-modal">
         <button class="mini-close" id="miniClose">✕</button>
+        <button class="mini-settings" id="miniSettings" title="Tuỳ chỉnh luật chơi">⚙️</button>
         <h3 id="miniTitle"></h3>
         <div class="mini-stage" id="miniStage"></div>
         <div class="mini-result" id="miniResult" hidden></div>
@@ -936,10 +1005,48 @@
         { name: "Oẳn tù tì với máy", emoji: "✊", file: null, play: "rps", desc: "Kéo búa bao đấu với máy, thua thì uống — chơi ngay trên trang!" },
       ],
     },
+    randomname: {
+      label: "Random tên", emoji: "🔤", tint2a: "#14b8a6", tint2b: "#0ea5e9",
+      custom: "names",
+      items: [
+        { name: "Người chơi 1", emoji: "🙋", file: null, desc: "Được chọn ngẫu nhiên trong danh sách của bạn!" },
+        { name: "Người chơi 2", emoji: "🙋", file: null, desc: "Được chọn ngẫu nhiên trong danh sách của bạn!" },
+        { name: "Người chơi 3", emoji: "🙋", file: null, desc: "Được chọn ngẫu nhiên trong danh sách của bạn!" },
+        { name: "Người chơi 4", emoji: "🙋", file: null, desc: "Được chọn ngẫu nhiên trong danh sách của bạn!" },
+      ],
+    },
+    randomnumber: {
+      label: "Random số", emoji: "🔢", tint2a: "#f43f5e", tint2b: "#fb923c",
+      custom: "number",
+      numberRange: { min: 0, max: 10 },
+      items: (() => {
+        const arr = [];
+        for (let i = 0; i <= 10; i++) arr.push({ name: String(i), emoji: "🔢", file: null, desc: "" });
+        return arr;
+      })(),
+    },
   };
 
   // ---------------- category screen ----------------
   const catGrid = document.getElementById("catGrid");
+
+  Object.keys(CATEGORIES).forEach((key) => {
+    const cat = CATEGORIES[key];
+    const btn = document.createElement("button");
+    btn.className = "cat-card";
+    btn.style.setProperty("--tint2a", cat.tint2a);
+    btn.style.setProperty("--tint2b", cat.tint2b);
+    btn.style.setProperty("--tint2", cat.tint2a);
+    btn.innerHTML =
+      '<div class="icon">' + cat.emoji + '</div>' +
+      '<div class="label">' + cat.label + '</div>' +
+      '<div class="count">' + (cat.custom ? "Tự nhập nội dung" : cat.items.length + " mục") + '</div>';
+    btn.addEventListener("click", () => {
+      if (cat.custom) openCustomSetup(key);
+      else openCategory(key);
+    });
+    catGrid.appendChild(btn);
+  });
 
   const quickBtn = document.createElement("button");
   quickBtn.className = "cat-card cat-card--quick";
@@ -952,21 +1059,6 @@
     '<div class="count">Chơi minigame không cần quay</div>';
   quickBtn.addEventListener("click", () => openQuickPick());
   catGrid.appendChild(quickBtn);
-
-  Object.keys(CATEGORIES).forEach((key) => {
-    const cat = CATEGORIES[key];
-    const btn = document.createElement("button");
-    btn.className = "cat-card";
-    btn.style.setProperty("--tint2a", cat.tint2a);
-    btn.style.setProperty("--tint2b", cat.tint2b);
-    btn.style.setProperty("--tint2", cat.tint2a);
-    btn.innerHTML =
-      '<div class="icon">' + cat.emoji + '</div>' +
-      '<div class="label">' + cat.label + '</div>' +
-      '<div class="count">' + cat.items.length + ' mục</div>';
-    btn.addEventListener("click", () => openCategory(key));
-    catGrid.appendChild(btn);
-  });
 
   // ---------------- quick pick overlay ----------------
   const quickPickOverlay = document.getElementById("quickPickOverlay");
@@ -1001,6 +1093,67 @@
     if (e.target === quickPickOverlay) quickPickOverlay.hidden = true;
   });
 
+  // ---------------- custom category setup (Random tên / Random số) ----------------
+  const categorySetupOverlay = document.getElementById("categorySetupOverlay");
+  const categorySetupTitle = document.getElementById("categorySetupTitle");
+  const categorySetupBody = document.getElementById("categorySetupBody");
+  const categorySetupStart = document.getElementById("categorySetupStart");
+  const categorySetupClose = document.getElementById("categorySetupClose");
+
+  function openCustomSetup(key) {
+    const cat = CATEGORIES[key];
+    categorySetupTitle.textContent = cat.emoji + " " + cat.label;
+
+    if (cat.custom === "names") {
+      const currentNames = cat.items.map((it) => it.name).join("\n");
+      categorySetupBody.innerHTML =
+        '<div class="config-form">' +
+        '<label class="config-label">Nhập tên tuỳ ý (mỗi dòng 1 tên):</label>' +
+        '<textarea id="setupNamesInput" class="config-textarea" rows="7">' + currentNames + '</textarea>' +
+        '<div class="config-hint">Cần ít nhất 2 tên. Để trống sẽ giữ danh sách hiện tại.</div>' +
+        '</div>';
+      categorySetupStart.onclick = () => {
+        const ta = document.getElementById("setupNamesInput");
+        const lines = ta.value.split("\n").map((s) => s.trim()).filter(Boolean);
+        if (lines.length >= 2) {
+          cat.items = lines.map((n) => ({ name: n, emoji: "🙋", file: null, desc: "Được chọn ngẫu nhiên trong danh sách của bạn!" }));
+        }
+        categorySetupOverlay.hidden = true;
+        openCategory(key);
+      };
+    } else if (cat.custom === "number") {
+      const range = cat.numberRange || { min: 0, max: 10 };
+      categorySetupBody.innerHTML =
+        '<div class="config-form config-form--row">' +
+        '<div><label class="config-label">Từ</label><input type="number" id="setupNumMin" class="config-input" value="' + range.min + '" /></div>' +
+        '<div><label class="config-label">Đến</label><input type="number" id="setupNumMax" class="config-input" value="' + range.max + '" /></div>' +
+        "</div>" +
+        '<div class="config-hint">Sẽ random 1 số nguyên trong khoảng đã nhập (tối đa 10.000 số).</div>';
+      categorySetupStart.onclick = () => {
+        let min = parseInt(document.getElementById("setupNumMin").value, 10);
+        let max = parseInt(document.getElementById("setupNumMax").value, 10);
+        if (isNaN(min)) min = range.min;
+        if (isNaN(max)) max = range.max;
+        if (min > max) { const t = min; min = max; max = t; }
+        if (max - min > 9999) max = min + 9999;
+        cat.numberRange = { min, max };
+        const items = [];
+        for (let i = min; i <= max; i++) items.push({ name: String(i), emoji: "🔢", file: null, desc: "" });
+        cat.items = items;
+        categorySetupOverlay.hidden = true;
+        openCategory(key);
+      };
+    }
+
+    categorySetupOverlay.hidden = false;
+  }
+  categorySetupClose.addEventListener("click", () => {
+    categorySetupOverlay.hidden = true;
+  });
+  categorySetupOverlay.addEventListener("click", (e) => {
+    if (e.target === categorySetupOverlay) categorySetupOverlay.hidden = true;
+  });
+
   // ---------------- spin screen ----------------
   const screenCategories = document.getElementById("screenCategories");
   const screenSpin = document.getElementById("screenSpin");
@@ -1016,6 +1169,7 @@
   const rName = document.getElementById("rName");
   const rDesc = document.getElementById("rDesc");
   const topSub = document.getElementById("topSub");
+  const catSettingsBtn = document.getElementById("catSettingsBtn");
 
   let currentKey = null;
   let spinning = false;
@@ -1030,6 +1184,13 @@
     screenSpin.hidden = false;
     result.hidden = true;
     spinBtnText.textContent = "Ú Òa";
+    if (cat.custom) {
+      catSettingsBtn.hidden = false;
+      catSettingsBtn.onclick = () => openCustomSetup(key);
+    } else {
+      catSettingsBtn.hidden = true;
+      catSettingsBtn.onclick = null;
+    }
     renderStaticReel(key);
   }
 
@@ -1159,6 +1320,7 @@
   const playBtn = document.getElementById("playBtn");
   const miniOverlay = document.getElementById("miniOverlay");
   const miniClose = document.getElementById("miniClose");
+  const miniSettings = document.getElementById("miniSettings");
   const miniTitle = document.getElementById("miniTitle");
   const miniStage = document.getElementById("miniStage");
   const miniResult = document.getElementById("miniResult");
@@ -1197,6 +1359,24 @@
     5: [0, 2, 4, 6, 8],
     6: [0, 2, 3, 5, 6, 8],
   };
+  const RPS_DEFAULTS = {
+    win: "Bạn thắng — mời 1 người bất kỳ uống cùng! 🎉",
+    lose: "Bạn thua — uống 1 ly! 😅",
+    tie: "Hoà — chơi lại ván nữa! 🤝",
+  };
+  const COIN_SIDES = ["Ngửa", "Sấp"];
+  const COIN_OUTCOMES_DEFAULT = [
+    "Uống 1 ly 🍺",
+    "Mời 1 người bất kỳ uống cùng 🍻",
+  ];
+
+  // Mutable copies so người dùng có thể tự chỉnh luật, nhưng vẫn có mặc định sẵn.
+  let customLots = LOT_OUTCOMES.slice();
+  let customCards = LOT_OUTCOMES.slice();
+  let customWheel = WHEEL_OUTCOMES.slice();
+  let customDice = DICE_OUTCOMES.slice();
+  let customCoin = COIN_OUTCOMES_DEFAULT.slice();
+  let customRps = Object.assign({}, RPS_DEFAULTS);
 
   let miniType = null;
 
@@ -1206,12 +1386,97 @@
     miniResult.hidden = true;
     miniResult.textContent = "";
     miniOverlay.hidden = false;
-    if (type === "lots") setupLots();
-    else if (type === "wheel") setupWheel();
-    else if (type === "cards") setupCards();
-    else if (type === "dice") setupDice();
-    else if (type === "coin") setupCoin();
-    else if (type === "rps") setupRps();
+    showMiniConfig(type);
+  }
+
+  function readConfigList() {
+    const ta = document.getElementById("configTextarea");
+    if (!ta) return [];
+    return ta.value.split("\n").map((s) => s.trim()).filter(Boolean);
+  }
+
+  function configListHtml(list, label, hint) {
+    return (
+      '<div class="config-form">' +
+      '<label class="config-label">' + label + "</label>" +
+      '<textarea id="configTextarea" class="config-textarea" rows="6">' + list.join("\n") + "</textarea>" +
+      (hint ? '<div class="config-hint">' + hint + "</div>" : "") +
+      "</div>"
+    );
+  }
+
+  function showMiniConfig(type) {
+    miniResult.hidden = true;
+    miniResult.textContent = "";
+
+    if (type === "lots" || type === "cards") {
+      const current = type === "lots" ? customLots : customCards;
+      miniStage.innerHTML = configListHtml(current, "Danh sách kết quả (mỗi dòng 1 kết quả):", "Cần ít nhất 2 dòng. Để trống sẽ dùng lại danh sách hiện tại.");
+      miniAction.textContent = "Bắt đầu";
+      miniAction.disabled = false;
+      miniAction.onclick = () => {
+        const lines = readConfigList();
+        const outcomes = lines.length >= 2 ? lines : (type === "lots" ? customLots : customCards);
+        if (type === "lots") { customLots = outcomes; setupLots(); }
+        else { customCards = outcomes; setupCards(); }
+      };
+    } else if (type === "wheel") {
+      miniStage.innerHTML = configListHtml(customWheel, "Danh sách ô trên vòng quay (mỗi dòng 1 ô):", "Cần ít nhất 2 dòng. Để trống sẽ dùng lại danh sách hiện tại.");
+      miniAction.textContent = "Bắt đầu";
+      miniAction.disabled = false;
+      miniAction.onclick = () => {
+        const lines = readConfigList();
+        customWheel = lines.length >= 2 ? lines : customWheel;
+        setupWheel();
+      };
+    } else if (type === "dice") {
+      miniStage.innerHTML = configListHtml(customDice, "Kết quả cho từng mặt xúc xắc (1→6):", "Cần đúng 6 dòng, ứng với mặt 1-6. Thiếu/thừa sẽ được tự điều chỉnh.");
+      miniAction.textContent = "Bắt đầu";
+      miniAction.disabled = false;
+      miniAction.onclick = () => {
+        let lines = readConfigList();
+        if (!lines.length) lines = customDice;
+        const fixed = lines.slice(0, 6);
+        while (fixed.length < 6) fixed.push(DICE_OUTCOMES[fixed.length % DICE_OUTCOMES.length]);
+        customDice = fixed;
+        setupDice();
+      };
+    } else if (type === "coin") {
+      miniStage.innerHTML = configListHtml(customCoin, "Kết quả cho từng mặt xu:", "Dòng 1 = Ngửa, dòng 2 = Sấp. Thiếu/thừa sẽ được tự điều chỉnh.");
+      miniAction.textContent = "Bắt đầu";
+      miniAction.disabled = false;
+      miniAction.onclick = () => {
+        let lines = readConfigList();
+        if (!lines.length) lines = customCoin;
+        const fixed = lines.slice(0, 2);
+        while (fixed.length < 2) fixed.push(COIN_OUTCOMES_DEFAULT[fixed.length % COIN_OUTCOMES_DEFAULT.length]);
+        customCoin = fixed;
+        setupCoin();
+      };
+    } else if (type === "rps") {
+      miniStage.innerHTML =
+        '<div class="config-form">' +
+        '<label class="config-label">Khi bạn thắng:</label>' +
+        '<input type="text" id="rpsWin" class="config-input" value="' + customRps.win + '" />' +
+        '<label class="config-label">Khi bạn thua:</label>' +
+        '<input type="text" id="rpsLose" class="config-input" value="' + customRps.lose + '" />' +
+        '<label class="config-label">Khi hoà:</label>' +
+        '<input type="text" id="rpsTie" class="config-input" value="' + customRps.tie + '" />' +
+        "</div>";
+      miniAction.textContent = "Bắt đầu";
+      miniAction.disabled = false;
+      miniAction.onclick = () => {
+        const win = document.getElementById("rpsWin").value.trim();
+        const lose = document.getElementById("rpsLose").value.trim();
+        const tie = document.getElementById("rpsTie").value.trim();
+        customRps = {
+          win: win || customRps.win,
+          lose: lose || customRps.lose,
+          tie: tie || customRps.tie,
+        };
+        setupRps();
+      };
+    }
   }
 
   function closeMiniGame() {
@@ -1219,13 +1484,16 @@
     miniAction.onclick = null;
   }
   miniClose.addEventListener("click", closeMiniGame);
+  miniSettings.addEventListener("click", () => {
+    if (miniType) showMiniConfig(miniType);
+  });
   miniOverlay.addEventListener("click", (e) => {
     if (e.target === miniOverlay) closeMiniGame();
   });
 
   // ---- Bốc thăm may rủi ----
   function setupLots() {
-    const picks = shuffle(LOT_OUTCOMES).slice(0, 6);
+    const picks = shuffle(customLots).slice(0, 6);
     miniStage.innerHTML =
       '<div class="slip-grid">' +
       picks.map((_, i) => '<button class="slip-btn" data-i="' + i + '">🎫</button>').join("") +
@@ -1250,7 +1518,7 @@
 
   // ---- Rút bài định mệnh ----
   function setupCards() {
-    const picks = shuffle(LOT_OUTCOMES).slice(0, 6);
+    const picks = shuffle(customCards).slice(0, 6);
     miniStage.innerHTML =
       '<div class="slip-grid">' +
       picks.map((_, i) => '<button class="card-btn" data-i="' + i + '">🂠</button>').join("") +
@@ -1276,7 +1544,7 @@
   // ---- Vòng quay may mắn ----
   let wheelCumulative = 0;
   function setupWheel() {
-    const n = WHEEL_OUTCOMES.length;
+    const n = customWheel.length;
     const seg = 360 / n;
     const colors = ["var(--accent)", "var(--accent2)"];
     const stops = [];
@@ -1291,7 +1559,7 @@
     wheelCumulative = 0;
     miniStage.innerHTML =
       '<div class="wheel-wrap"><div class="wheel-pointer"></div><div class="wheel" id="wheelEl" style="background: conic-gradient(' + stops.join(", ") + ')">' + nums.join("") + "</div></div>" +
-      '<div class="wheel-legend">' + WHEEL_OUTCOMES.map((t, i) => "<div><b>" + (i + 1) + ".</b> " + t + "</div>").join("") + "</div>";
+      '<div class="wheel-legend">' + customWheel.map((t, i) => "<div><b>" + (i + 1) + ".</b> " + t + "</div>").join("") + "</div>";
     miniAction.textContent = "Quay!";
     miniAction.disabled = false;
     miniAction.onclick = spinWheel;
@@ -1299,7 +1567,7 @@
   function spinWheel() {
     miniAction.disabled = true;
     miniResult.hidden = true;
-    const n = WHEEL_OUTCOMES.length;
+    const n = customWheel.length;
     const seg = 360 / n;
     const winIdx = Math.floor(Math.random() * n);
     const wheelEl = document.getElementById("wheelEl");
@@ -1317,7 +1585,7 @@
     function onWheelEnd(e) {
       if (e.propertyName !== "transform") return;
       wheelEl.removeEventListener("transitionend", onWheelEnd);
-      miniResult.textContent = (winIdx + 1) + ". " + WHEEL_OUTCOMES[winIdx];
+      miniResult.textContent = (winIdx + 1) + ". " + customWheel[winIdx];
       miniResult.hidden = false;
       miniAction.disabled = false;
       miniAction.textContent = "Quay lại";
@@ -1354,7 +1622,7 @@
         dieEl.classList.remove("is-rolling");
         const finalValue = 1 + Math.floor(Math.random() * 6);
         dieEl.innerHTML = dieCellsHtml(finalValue);
-        miniResult.textContent = "🎲 " + finalValue + " — " + DICE_OUTCOMES[finalValue - 1];
+        miniResult.textContent = "🎲 " + finalValue + " — " + customDice[finalValue - 1];
         miniResult.hidden = false;
         miniAction.disabled = false;
         miniAction.textContent = "Đổ lại";
@@ -1363,11 +1631,6 @@
   }
 
   // ---- Lật đồng xu định mệnh ----
-  const COIN_SIDES = ["Ngửa", "Sấp"];
-  const COIN_OUTCOMES = [
-    "Uống 1 ly 🍺",
-    "Mời 1 người bất kỳ uống cùng 🍻",
-  ];
   function setupCoin() {
     miniStage.innerHTML = '<div class="coin-face" id="coinEl">🪙</div>';
     miniAction.textContent = "Lật xu!";
@@ -1386,7 +1649,7 @@
         clearInterval(timer);
         coinEl.classList.remove("is-flipping");
         const idx = Math.floor(Math.random() * 2);
-        miniResult.textContent = "🪙 " + COIN_SIDES[idx] + " — " + COIN_OUTCOMES[idx];
+        miniResult.textContent = "🪙 " + COIN_SIDES[idx] + " — " + customCoin[idx];
         miniResult.hidden = false;
         miniAction.disabled = false;
         miniAction.textContent = "Lật lại";
@@ -1421,9 +1684,9 @@
         const userMove = RPS_MOVES.find((m) => m.key === btn.dataset.k);
         const compMove = RPS_MOVES[Math.floor(Math.random() * RPS_MOVES.length)];
         let outcome;
-        if (userMove.key === compMove.key) outcome = "🤝 Hòa — chơi lại ván nữa!";
-        else if (RPS_BEATS[userMove.key] === compMove.key) outcome = "🎉 Bạn thắng — mời 1 người bất kỳ uống cùng!";
-        else outcome = "😅 Bạn thua — uống 1 ly!";
+        if (userMove.key === compMove.key) outcome = customRps.tie;
+        else if (RPS_BEATS[userMove.key] === compMove.key) outcome = customRps.win;
+        else outcome = customRps.lose;
 
         miniResult.innerHTML = "Bạn: " + userMove.emoji + " — Máy: " + compMove.emoji + "<br>" + outcome;
         miniResult.hidden = false;
