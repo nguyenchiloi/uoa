@@ -464,6 +464,35 @@
   }
   .mini-action:disabled { filter: grayscale(.3) brightness(.9); cursor: default; }
 
+  /* Quick pick overlay */
+  .quick-pick-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .quick-pick-btn {
+    border: 1px solid var(--card-line);
+    background: linear-gradient(155deg, var(--bg2), #1a1526);
+    color: var(--ink);
+    font-family: inherit;
+    border-radius: 14px;
+    padding: 12px 6px;
+    cursor: pointer;
+    text-align: center;
+    transition: transform .12s ease, border-color .12s ease;
+  }
+  .quick-pick-btn:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--tint2, var(--accent2)) 55%, var(--card-line));
+  }
+  .quick-pick-btn .qp-icon { font-size: 1.6rem; display: block; margin-bottom: 4px; }
+  .quick-pick-btn .qp-label { font-size: .78rem; font-weight: 600; line-height: 1.2; }
+
+  .cat-card.cat-card--quick {
+    border-color: color-mix(in srgb, var(--tint2, #fff) 45%, var(--card-line));
+  }
+
   /* Wheel */
   .wheel-wrap { position: relative; width: 200px; height: 200px; }
   .wheel-pointer {
@@ -630,6 +659,15 @@
     </section>
 
     <p class="footer">Được làm bởi <b>Chú Vịt Vàng (NCL)</b> 🦆</p>
+
+    <div class="mini-overlay" id="quickPickOverlay" hidden>
+      <div class="mini-modal">
+        <button class="mini-close" id="quickPickClose">✕</button>
+        <h3>🎯 Chơi ngay</h3>
+        <p style="color:var(--muted);font-size:.85rem;margin-top:6px;">Chọn thể loại bạn muốn chơi ngay:</p>
+        <div class="quick-pick-grid" id="quickPickGrid"></div>
+      </div>
+    </div>
 
     <div class="mini-overlay" id="miniOverlay" hidden>
       <div class="mini-modal">
@@ -865,6 +903,19 @@
 
   // ---------------- category screen ----------------
   const catGrid = document.getElementById("catGrid");
+
+  const quickBtn = document.createElement("button");
+  quickBtn.className = "cat-card cat-card--quick";
+  quickBtn.style.setProperty("--tint2a", "#818cf8");
+  quickBtn.style.setProperty("--tint2b", "#f472b6");
+  quickBtn.style.setProperty("--tint2", "#c084fc");
+  quickBtn.innerHTML =
+    '<div class="icon">🎯</div>' +
+    '<div class="label">Chơi ngay</div>' +
+    '<div class="count">Chọn nhanh thể loại</div>';
+  quickBtn.addEventListener("click", () => openQuickPick());
+  catGrid.appendChild(quickBtn);
+
   Object.keys(CATEGORIES).forEach((key) => {
     const cat = CATEGORIES[key];
     const btn = document.createElement("button");
@@ -878,6 +929,36 @@
       '<div class="count">' + cat.items.length + ' mục</div>';
     btn.addEventListener("click", () => openCategory(key));
     catGrid.appendChild(btn);
+  });
+
+  // ---------------- quick pick overlay ----------------
+  const quickPickOverlay = document.getElementById("quickPickOverlay");
+  const quickPickGrid = document.getElementById("quickPickGrid");
+  const quickPickClose = document.getElementById("quickPickClose");
+
+  Object.keys(CATEGORIES).forEach((key) => {
+    const cat = CATEGORIES[key];
+    const btn = document.createElement("button");
+    btn.className = "quick-pick-btn";
+    btn.style.setProperty("--tint2", cat.tint2a);
+    btn.innerHTML =
+      '<span class="qp-icon">' + cat.emoji + '</span>' +
+      '<span class="qp-label">' + cat.label + '</span>';
+    btn.addEventListener("click", () => {
+      quickPickOverlay.hidden = true;
+      openCategory(key);
+    });
+    quickPickGrid.appendChild(btn);
+  });
+
+  function openQuickPick() {
+    quickPickOverlay.hidden = false;
+  }
+  quickPickClose.addEventListener("click", () => {
+    quickPickOverlay.hidden = true;
+  });
+  quickPickOverlay.addEventListener("click", (e) => {
+    if (e.target === quickPickOverlay) quickPickOverlay.hidden = true;
   });
 
   // ---------------- spin screen ----------------
@@ -1061,12 +1142,12 @@
   ];
   const WHEEL_OUTCOMES = [
     "Uống 1 ly", "Uống 2 ly", "Mời người bên trái uống",
-    "Mời người bên phải uống", "Được tha, khỏi uống", "Uống cạn ly",
+    "Mời người bên phải uống", "Được tha, khỏi uống", "Tất cả đều uống",
     "Làm 1 thử thách bất kỳ", "Hát 1 câu bất kỳ",
   ];
   const DICE_OUTCOMES = [
     "Uống 1 ly", "Uống 2 ly", "Mời 1 người uống cùng",
-    "Được tha, khỏi uống", "Uống cạn ly", "Làm 1 thử thách vui",
+    "Được tha, khỏi uống", "Tất cả đều uống", "Làm 1 thử thách vui",
   ];
   const DIE_LAYOUTS = {
     1: [4],
