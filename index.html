@@ -593,6 +593,44 @@
     background: #1c1626;
   }
 
+  /* Coin flip */
+  .coin-face {
+    width: 84px; height: 84px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #facc15, #eab308);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.4rem;
+    box-shadow: 0 10px 22px -10px rgba(0,0,0,.6);
+  }
+  .coin-face.is-flipping { animation: coinFlip .12s linear infinite; }
+  @keyframes coinFlip {
+    0% { transform: rotateY(0deg) scale(1); }
+    50% { transform: rotateY(180deg) scale(1.08); }
+    100% { transform: rotateY(360deg) scale(1); }
+  }
+
+  /* Rock paper scissors */
+  .rps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .rps-btn {
+    width: 64px; height: 64px;
+    border-radius: 16px;
+    border: 2px solid color-mix(in srgb, var(--accent2) 50%, var(--card-line));
+    background: linear-gradient(155deg, color-mix(in srgb, var(--accent) 30%, var(--card)), var(--card));
+    font-size: 1.8rem;
+    cursor: pointer;
+  }
+  .rps-btn:disabled { opacity: .35; cursor: default; }
+  .rps-btn.is-picked { border-color: var(--accent2); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent2) 45%, transparent); }
+  .rps-legend {
+    margin-top: 10px;
+    font-size: .78rem;
+    color: var(--muted);
+  }
+
   .hint {
     text-align: center;
     margin-top: 14px;
@@ -664,7 +702,7 @@
       <div class="mini-modal">
         <button class="mini-close" id="quickPickClose">✕</button>
         <h3>🎯 Chơi ngay</h3>
-        <p style="color:var(--muted);font-size:.85rem;margin-top:6px;">Chọn thể loại bạn muốn chơi ngay:</p>
+        <p style="color:var(--muted);font-size:.85rem;margin-top:6px;">Chọn 1 trò để chơi ngay, không cần quay:</p>
         <div class="quick-pick-grid" id="quickPickGrid"></div>
       </div>
     </div>
@@ -884,9 +922,6 @@
       label: "Trò chơi ăn nhậu", emoji: "🍻", tint2a: "#dc2626", tint2b: "#f59e0b",
       items: [
         { name: "Oẳn tù tì", emoji: "🪨", file: null, desc: "Kéo búa bao, thua thì uống — đơn giản mà không bao giờ chán." },
-        { name: "Xì dách", emoji: "🃏", file: null, desc: "Rút bài so điểm gần 21, thua ván nào uống ván đó." },
-        { name: "Bầu cua tôm cá", emoji: "🦀", file: null, desc: "Lắc xúc xắc đoán hình, đặt cửa sai thì làm một ly." },
-        { name: "Vua đại tần", emoji: "👑", file: null, desc: "Rút bài theo luật quy định sẵn, mỗi lá bài một hình phạt uống." },
         { name: "Chưa từng", emoji: "🤫", file: null, desc: "Ai từng làm điều được nhắc tới thì uống một ly." },
         { name: "Đếm số né số cấm", emoji: "🔢", file: null, desc: "Đếm tuần tự, ai vào đúng số cấm (như 3, 7) mà không né thì uống." },
         { name: "Ai nhanh tay đó thắng", emoji: "✋", file: null, desc: "Phản xạ nhanh trong trò chơi tay, chậm tay là uống phạt." },
@@ -897,6 +932,8 @@
         { name: "Vòng quay may mắn", emoji: "🎡", file: null, play: "wheel", desc: "Quay vòng may mắn, kim chỉ dừng ở đâu thì chịu hình phạt ở đó — chơi ngay trên trang!" },
         { name: "Rút bài định mệnh", emoji: "🃏", file: null, play: "cards", desc: "Chọn một lá bài úp để lật ra thử thách của riêng bạn — chơi ngay trên trang!" },
         { name: "Xúc xắc định mệnh", emoji: "🎲", file: null, play: "dice", desc: "Đổ xúc xắc, số hiện lên sẽ quyết định hình phạt — chơi ngay trên trang!" },
+        { name: "Lật đồng xu định mệnh", emoji: "🪙", file: null, play: "coin", desc: "Sấp hay ngửa? Lật xu để định đoạt hình phạt — chơi ngay trên trang!" },
+        { name: "Oẳn tù tì với máy", emoji: "✊", file: null, play: "rps", desc: "Kéo búa bao đấu với máy, thua thì uống — chơi ngay trên trang!" },
       ],
     },
   };
@@ -912,7 +949,7 @@
   quickBtn.innerHTML =
     '<div class="icon">🎯</div>' +
     '<div class="label">Chơi ngay</div>' +
-    '<div class="count">Chọn nhanh thể loại</div>';
+    '<div class="count">Chơi minigame không cần quay</div>';
   quickBtn.addEventListener("click", () => openQuickPick());
   catGrid.appendChild(quickBtn);
 
@@ -938,17 +975,20 @@
 
   Object.keys(CATEGORIES).forEach((key) => {
     const cat = CATEGORIES[key];
-    const btn = document.createElement("button");
-    btn.className = "quick-pick-btn";
-    btn.style.setProperty("--tint2", cat.tint2a);
-    btn.innerHTML =
-      '<span class="qp-icon">' + cat.emoji + '</span>' +
-      '<span class="qp-label">' + cat.label + '</span>';
-    btn.addEventListener("click", () => {
-      quickPickOverlay.hidden = true;
-      openCategory(key);
+    cat.items.forEach((item) => {
+      if (!item.play) return;
+      const btn = document.createElement("button");
+      btn.className = "quick-pick-btn";
+      btn.style.setProperty("--tint2", cat.tint2a);
+      btn.innerHTML =
+        '<span class="qp-icon">' + item.emoji + '</span>' +
+        '<span class="qp-label">' + item.name + '</span>';
+      btn.addEventListener("click", () => {
+        quickPickOverlay.hidden = true;
+        openMiniGame(item.play, item.name);
+      });
+      quickPickGrid.appendChild(btn);
     });
-    quickPickGrid.appendChild(btn);
   });
 
   function openQuickPick() {
@@ -1170,6 +1210,8 @@
     else if (type === "wheel") setupWheel();
     else if (type === "cards") setupCards();
     else if (type === "dice") setupDice();
+    else if (type === "coin") setupCoin();
+    else if (type === "rps") setupRps();
   }
 
   function closeMiniGame() {
@@ -1318,6 +1360,77 @@
         miniAction.textContent = "Đổ lại";
       }
     }, 80);
+  }
+
+  // ---- Lật đồng xu định mệnh ----
+  const COIN_SIDES = ["Ngửa", "Sấp"];
+  const COIN_OUTCOMES = [
+    "Uống 1 ly 🍺",
+    "Mời 1 người bất kỳ uống cùng 🍻",
+  ];
+  function setupCoin() {
+    miniStage.innerHTML = '<div class="coin-face" id="coinEl">🪙</div>';
+    miniAction.textContent = "Lật xu!";
+    miniAction.disabled = false;
+    miniAction.onclick = flipCoin;
+  }
+  function flipCoin() {
+    miniAction.disabled = true;
+    miniResult.hidden = true;
+    const coinEl = document.getElementById("coinEl");
+    coinEl.classList.add("is-flipping");
+    let ticks = 0;
+    const timer = setInterval(() => {
+      ticks++;
+      if (ticks >= 10) {
+        clearInterval(timer);
+        coinEl.classList.remove("is-flipping");
+        const idx = Math.floor(Math.random() * 2);
+        miniResult.textContent = "🪙 " + COIN_SIDES[idx] + " — " + COIN_OUTCOMES[idx];
+        miniResult.hidden = false;
+        miniAction.disabled = false;
+        miniAction.textContent = "Lật lại";
+      }
+    }, 80);
+  }
+
+  // ---- Oẳn tù tì với máy ----
+  const RPS_MOVES = [
+    { key: "rock", emoji: "✊", label: "Búa" },
+    { key: "paper", emoji: "✋", label: "Bao" },
+    { key: "scissors", emoji: "✌️", label: "Kéo" },
+  ];
+  const RPS_BEATS = { rock: "scissors", paper: "rock", scissors: "paper" };
+  function setupRps() {
+    miniStage.innerHTML =
+      '<div class="rps-grid">' +
+      RPS_MOVES.map((m) => '<button class="rps-btn" data-k="' + m.key + '">' + m.emoji + "</button>").join("") +
+      "</div>" +
+      '<div class="rps-legend">✊ Búa · ✋ Bao · ✌️ Kéo</div>';
+    miniAction.textContent = "Chơi lại";
+    miniAction.disabled = true;
+    miniAction.onclick = setupRps;
+
+    miniStage.querySelectorAll(".rps-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (miniStage.dataset.locked) return;
+        miniStage.dataset.locked = "1";
+        miniStage.querySelectorAll(".rps-btn").forEach((b) => { b.disabled = true; });
+        btn.classList.add("is-picked");
+
+        const userMove = RPS_MOVES.find((m) => m.key === btn.dataset.k);
+        const compMove = RPS_MOVES[Math.floor(Math.random() * RPS_MOVES.length)];
+        let outcome;
+        if (userMove.key === compMove.key) outcome = "🤝 Hòa — chơi lại ván nữa!";
+        else if (RPS_BEATS[userMove.key] === compMove.key) outcome = "🎉 Bạn thắng — mời 1 người bất kỳ uống cùng!";
+        else outcome = "😅 Bạn thua — uống 1 ly!";
+
+        miniResult.innerHTML = "Bạn: " + userMove.emoji + " — Máy: " + compMove.emoji + "<br>" + outcome;
+        miniResult.hidden = false;
+        miniAction.disabled = false;
+      });
+    });
+    delete miniStage.dataset.locked;
   }
 </script>
 </body>
